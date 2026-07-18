@@ -27,7 +27,7 @@ shape = SubResource("RectangleShape2D_jgqa8")
 [node name="Polygon2D" type="Polygon2D" parent="Ground" unique_id=129698167]
 
 [node name="Platform" type="StaticBody2D" parent="." unique_id=848757763]
-position = Vector2(200, 200)
+position = Vector2(200, 250)
 physics_material_override = SubResource("PhysicsMaterial_v45ci")
 script = ExtResource("2_yautc")
 
