@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bcvcw6tgrbkr2"]
+
+[ext_resource type="Script" uid="uid://dks3vj2ocyya5" path="res://scripts/managers/test_ground.gd" id="1_jbqir"]
+[ext_resource type="Script" uid="uid://wg2ylam521ca" path="res://scripts/managers/test_platform.gd" id="2_yautc"]
+[ext_resource type="PackedScene" uid="uid://dxgtr3egk55au" path="res://scenes/player/player.tscn" id="3_fr1um"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_fr1um"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jgqa8"]
+size = Vector2(2000, 40)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_v45ci"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st1g6"]
+size = Vector2(200, 20)
+
+[node name="TestLevel" type="Node2D" unique_id=1287401612]
+
+[node name="Ground" type="StaticBody2D" parent="." unique_id=593486914]
+position = Vector2(0, 360)
+physics_material_override = SubResource("PhysicsMaterial_fr1um")
+script = ExtResource("1_jbqir")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=388945578]
+shape = SubResource("RectangleShape2D_jgqa8")
+
+[node name="Polygon2D" type="Polygon2D" parent="Ground" unique_id=129698167]
+
+[node name="Platform" type="StaticBody2D" parent="." unique_id=848757763]
+position = Vector2(200, 200)
+physics_material_override = SubResource("PhysicsMaterial_v45ci")
+script = ExtResource("2_yautc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform" unique_id=450430827]
+shape = SubResource("RectangleShape2D_st1g6")
+
+[node name="Player" parent="." unique_id=422246210 instance=ExtResource("3_fr1um")]
+position = Vector2(0, 100)
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=218585631]
+position_smoothing_enabled = true

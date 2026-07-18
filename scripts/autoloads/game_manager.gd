@@ -45,7 +45,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	# Listen for the pause button from anywhere in the game
 	# _unhandled_input only fires if no other node consumed the event first
-	if event.is_action_just_pressed("pause"):
+	if Input.is_action_just_pressed("pause"):
 		toggle_pause()
 
 
