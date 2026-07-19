@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dxgtr3egk55au"]
 
 [ext_resource type="Script" uid="uid://blfafydbim2g4" path="res://scenes/player/player.gd" id="1_8afob"]
+[ext_resource type="SpriteFrames" uid="uid://dnxmwddbhlc2m" path="res://assets/sprites/player/player_frames.tres" id="2_dovo2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jgqa8"]
 size = Vector2(20, 48)
@@ -12,3 +13,11 @@ script = ExtResource("1_8afob")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082857435]
 shape = SubResource("RectangleShape2D_jgqa8")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=560794161]
+position = Vector2(0, -24)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("2_dovo2")
+animation = &"idle"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=791888889]

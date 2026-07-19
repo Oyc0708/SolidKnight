@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dxgtr3egk55au" path="res://scenes/player/player.tscn" id="3_fr1um"]
 [ext_resource type="Script" uid="uid://cni7k1651hoet" path="res://scripts/managers/test_wall.gd" id="4_v45ci"]
 [ext_resource type="Script" uid="uid://ukqnmwvfp2dl" path="res://scripts/managers/test_one_way_platform.gd" id="5_48ne7"]
+[ext_resource type="Script" uid="uid://ba8p4w38l5j83" path="res://scripts/managers/test_slope.gd" id="6_6xh4u"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_fr1um"]
 
@@ -27,6 +28,12 @@ size = Vector2(32, 250)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3at6u"]
 size = Vector2(180, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4hq7u"]
+size = Vector2(180, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_di6hr"]
+size = Vector2(150, 14)
 
 [node name="TestLevel" type="Node2D" unique_id=1287401612]
 
@@ -96,3 +103,20 @@ script = ExtResource("5_48ne7")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="OneWayPlatform" unique_id=612374683]
 shape = SubResource("RectangleShape2D_3at6u")
 one_way_collision = true
+
+[node name="SlopeGentle" type="StaticBody2D" parent="." unique_id=1589844309]
+position = Vector2(-500, 340)
+rotation = -0.34906584
+script = ExtResource("6_6xh4u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SlopeGentle" unique_id=813042236]
+shape = SubResource("RectangleShape2D_4hq7u")
+
+[node name="SlopeSteep" type="StaticBody2D" parent="." unique_id=68705257]
+position = Vector2(284, 204)
+rotation = -0.9075712
+script = ExtResource("6_6xh4u")
+slope_color = Color(0.4, 0.38039216, 0.52156866, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SlopeSteep" unique_id=682729057]
+shape = SubResource("RectangleShape2D_di6hr")
