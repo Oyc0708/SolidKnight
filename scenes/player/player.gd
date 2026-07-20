@@ -213,7 +213,6 @@ func _ready() -> void:
 	collision_mask  = 0
 	set_collision_mask_value(1,  true)    # World
 	set_collision_mask_value(13, true)    # OneWayPlatform
-	set_meta("hide_placeholder", true)
 
 	# ── Floor snap ← NEW M1.6 ────────────────────────────────────────────────
 	# Keeps the player grounded when walking over convex surfaces (slope tops).
@@ -236,8 +235,6 @@ func _draw() -> void:
 	var body_color: Color
 	var show_eyes: bool = true
 
-	if has_meta("hide placeholder"):
-		return
 		
 	if _is_dashing:
 		body_width  = PLACEHOLDER_WIDTH * 1.6
@@ -664,3 +661,34 @@ func _update_floor_state() -> void:
 		_current_floor_angle = 0.0
 
 	_was_on_floor = is_on_floor()
+
+# ─── PUBLIC ACCESSORS FOR ANIMATION CONTROLLER ───────────────────────────────
+# These functions expose private state as read-only values.
+# The animation controller READS these. It never calls any other function here.
+
+## Returns true while the player is actively dashing
+func is_dashing() -> bool:
+	return _is_dashing
+
+
+## Returns true while the player is wall sliding against a surface
+func is_wall_sliding() -> bool:
+	return _is_wall_sliding
+
+
+## Returns seconds of remaining knockback control lock (0.0 when expired)
+## Non-zero means the player was recently hit and control is suppressed
+func get_knockback_timer() -> float:
+	return _knockback_timer
+
+
+## Returns seconds remaining on the double jump ring visual timer
+## Non-zero for 0.15s immediately after a double jump is used
+## Used for rising-edge detection to trigger the double jump animation
+func get_double_jump_flash_timer() -> float:
+	return _double_jump_flash_timer
+
+## Returns the floor tilt angle in radians
+## 0.0 = flat ground   positive = right-side higher   negative = left-side higher
+func get_current_floor_angle() -> float:
+	return _current_floor_angle

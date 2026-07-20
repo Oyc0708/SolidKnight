@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://blfafydbim2g4" path="res://scenes/player/player.gd" id="1_8afob"]
 [ext_resource type="SpriteFrames" uid="uid://dnxmwddbhlc2m" path="res://assets/sprites/player/player_frames.tres" id="2_dovo2"]
+[ext_resource type="Script" uid="uid://ckoukomd2vaby" path="res://scripts/player/player_animation.gd" id="3_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jgqa8"]
 size = Vector2(20, 48)
@@ -18,6 +19,5 @@ shape = SubResource("RectangleShape2D_jgqa8")
 position = Vector2(0, -24)
 scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_dovo2")
-animation = &"idle"
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=791888889]
+animation = &"jump_fall"
+script = ExtResource("3_gmlin")
