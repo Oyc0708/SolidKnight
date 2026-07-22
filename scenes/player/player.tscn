@@ -21,3 +21,5 @@ scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_dovo2")
 animation = &"jump_fall"
 script = ExtResource("3_gmlin")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=958145430]

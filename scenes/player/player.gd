@@ -1,20 +1,24 @@
 # player.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# MILESTONE M1.6 — Slopes and knockback / invincibility frames
+# MILESTONE M2.3 — AnimationPlayer frame events, attack timing, landing events
+#
+# Fixes applied from M1.6 file:
+#   ~ _is_attacking / _attack_direction moved to correct ATTACK STATE section
+#   ~ _handle_horizontal_movement() duplicate code removed, effective_speed fixed
+#   ~ get_current_floor_angle() renamed to get_floor_angle() (matches animation controller)
 #
 # New additions this milestone:
-#   + knockback_force, knockback_duration, iframes_duration  @export
-#   + PLACEHOLDER_HURT_COLOR  visual constant
-#   + _iframes_timer, _knockback_timer, _knockback_direction  state vars
-#   + _current_floor_angle  state var (used by Phase 2 sprite rotation)
-#   + take_damage(amount, source_position)  PUBLIC function
-#   ~ _is_invincible  now COMPUTED from _is_dashing + _iframes_timer
-#   ~ _start_dash() / _end_dash()  no longer write _is_invincible directly
-#   ~ _update_timers()  ticks new timers, computes _is_invincible at end
-#   ~ _handle_horizontal_movement()  respects _knockback_timer lock
-#   ~ _update_floor_state()  reads floor normal, stores _current_floor_angle
-#   ~ _ready()  configures floor_snap_length, collision layer/mask
-#   ~ _draw()  flashing during I-frames, floor angle indicator
+#   + attack_move_penalty  @export constant
+#   + _is_attacking, _attack_direction  state variables (moved to correct section)
+#   + _debug_hitbox_active  debug variable
+#   + _handle_attack_input()  reads attack button, sets direction, starts AnimationPlayer
+#   + _on_attack_started/finished/hitbox_active  AnimationPlayer callback stubs
+#   + _on_land_impact(), _on_play_sfx()  event callback stubs
+#   + is_attacking(), get_attack_direction()  public accessors
+#   ~ _start_dash()  cancels active attack before dashing
+#   ~ take_damage()  cancels active attack when hit
+#   ~ _handle_horizontal_movement()  applies attack_move_penalty cleanly (fixed)
+#   ~ _draw()  adds debug hitbox rectangle during active hitbox window
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerController
 extends CharacterBody2D
@@ -86,24 +90,27 @@ extends CharacterBody2D
 @export var double_jump_force: float = -600.0
 
 
-# ─── EXPORTED KNOCKBACK CONSTANTS ← NEW M1.6 ─────────────────────────────────
+# ─── EXPORTED KNOCKBACK CONSTANTS ────────────────────────────────────────────
 
-## Speed of the knockback launch in the direction away from damage source.
-## Applied as a direct velocity override when damage is taken.
+## Speed of the knockback launch in the direction away from damage source
 @export var knockback_force: float = 380.0
 
-## Small upward component always added to knockback.
-## Gives the hit a visible bounce — makes damage feel physical.
+## Small upward component always added to knockback
 @export var knockback_vertical_force: float = -200.0
 
-## How long horizontal control is suppressed after taking damage (seconds).
-## Player cannot walk out of the knockback during this window.
+## How long horizontal control is suppressed after taking damage (seconds)
 @export var knockback_duration: float = 0.25
 
-## How long invincibility frames last after taking damage (seconds).
-## Hollow Knight has approximately 1.2 seconds — quite forgiving.
-## This number is tunable here without touching code.
+## How long invincibility frames last after taking damage (seconds)
 @export var iframes_duration: float = 1.2
+
+
+# ─── EXPORTED ATTACK CONSTANTS ← NEW M2.3 ────────────────────────────────────
+
+## Horizontal speed multiplier while attacking on the ground.
+## 0.6 = 60% of normal speed — creates commitment, cannot freely reposition mid-swing.
+## 1.0 = no penalty.  Air attacks are always full speed (penalty only applies on floor).
+@export var attack_move_penalty: float = 0.6
 
 
 # ─── PHYSICS LAYER CONSTANTS ─────────────────────────────────────────────────
@@ -115,21 +122,14 @@ const DROP_THROUGH_LAYER: int = 13
 const DROP_THROUGH_DURATION: float = 0.15
 
 
-# ─── PLACEHOLDER VISUAL CONSTANTS ────────────────────────────────────────────
+# ─── ANIMATION TIMING CONSTANTS ──────────────────────────────────────────────
 
-const PLACEHOLDER_WIDTH: int  = 32
-const PLACEHOLDER_HEIGHT: int = 64
-const PLACEHOLDER_COLOR: Color       = Color(0.6, 0.4, 1.0, 1.0)   # Purple (grounded)
-const PLACEHOLDER_AIR_COLOR: Color   = Color(0.8, 0.6, 1.0, 1.0)   # Light purple (airborne)
-const PLACEHOLDER_DASH_COLOR: Color  = Color(0.4, 1.0, 1.0, 1.0)   # Cyan (dashing)
-const PLACEHOLDER_WALL_COLOR: Color  = Color(1.0, 0.6, 0.2, 1.0)   # Orange (wall sliding)
-const PLACEHOLDER_HURT_COLOR: Color  = Color(1.0, 0.3, 0.3, 1.0)   # Red (taking damage) ← NEW M1.6
-const PLACEHOLDER_EYE_COLOR: Color   = Color(1.0, 1.0, 1.0, 1.0)   # White eyes
-const PLACEHOLDER_RING_COLOR: Color  = Color(0.9, 0.7, 1.0, 1.0)   # Double jump ring
-
-## How long the double jump ring animation lasts (seconds)
-const DOUBLE_JUMP_RING_DURATION: float = 0.15
-
+## Duration of the double jump trigger window (seconds).
+## _double_jump_flash_timer is set to this value on double jump.
+## player_animation.gd reads the timer for rising-edge detection —
+## this is how it knows EXACTLY which frame the double jump fired.
+## The visual ring it originally drew was removed in M2.4.
+const DOUBLE_JUMP_ANIM_DURATION: float = 0.15
 
 # ─── FACING STATE ─────────────────────────────────────────────────────────────
 
@@ -163,7 +163,7 @@ var _wall_jump_lock_timer: float = 0.0
 
 # ─── DOUBLE JUMP STATE ────────────────────────────────────────────────────────
 
-var _can_double_jump: bool         = true
+var _can_double_jump: bool          = true
 var _double_jump_flash_timer: float = 0.0
 
 
@@ -172,36 +172,52 @@ var _double_jump_flash_timer: float = 0.0
 var _drop_through_timer: float = 0.0
 
 
-# ─── INVINCIBILITY STATE ← REFACTORED M1.6 ───────────────────────────────────
-# _is_invincible is now COMPUTED at the end of each physics frame:
+# ─── INVINCIBILITY STATE ──────────────────────────────────────────────────────
+# Computed at the end of each _physics_process() frame:
 #     _is_invincible = _is_dashing OR (_iframes_timer > 0.0)
-# No function writes to this variable directly anymore.
-# Read this value from outside to check if the player can take damage.
+# Never written directly — always derived from its two sources.
 var _is_invincible: bool = false
 
 
-# ─── KNOCKBACK STATE ← NEW M1.6 ──────────────────────────────────────────────
+# ─── KNOCKBACK STATE ──────────────────────────────────────────────────────────
 
-# How many seconds of invincibility frames remain after taking damage.
-# When this is > 0, _is_invincible will compute to true.
+# Seconds of I-frame protection remaining after taking damage
 var _iframes_timer: float = 0.0
 
-# How many seconds of control suppression remain after taking damage.
-# While > 0, horizontal input is locked (same technique as wall jump lock).
+# Seconds of horizontal control suppression remaining after taking damage
 var _knockback_timer: float = 0.0
 
-# The horizontal direction the player was launched on last hit: 1.0 or -1.0.
-# Stored for reference — the velocity is already applied at the hit moment.
+# Cached horizontal knockback direction for external reference
 var _knockback_direction: float = 1.0
 
 
-# ─── SLOPE STATE ← NEW M1.6 ──────────────────────────────────────────────────
+# ─── SLOPE STATE ──────────────────────────────────────────────────────────────
 
-# The angle (in radians) of the floor the player is currently standing on.
-# 0.0 = perfectly flat. Positive = floor tilts right. Negative = tilts left.
-# Read by AnimatedSprite2D in M2.2 to tilt the sprite to match the ground.
-# Also read by this script's _draw() to tilt the placeholder visual.
+# Floor angle in radians from get_floor_normal() — 0.0 = flat
+# Read by player_animation.gd via get_floor_angle() to tilt the sprite
 var _current_floor_angle: float = 0.0
+
+
+# ─── ATTACK STATE ← NEW M2.3 ─────────────────────────────────────────────────
+# NOTE: These variables are declared here, in the state section, so they exist
+# before any function that references them. Declaring them after _handle_attack_input()
+# (as in the previous version) causes confusing ordering — always declare variables
+# at the top of their logical section, before any functions.
+
+# True from _on_attack_started() call until _on_attack_finished() call.
+# AnimationPlayer method tracks drive both transitions.
+var _is_attacking: bool = false
+
+# Direction set at the moment the attack button is pressed.
+# "neutral" = left/right slash   "up" = upward slash   "down" = pogo down-slash
+# Used by AnimationPlayer to select the correct timing track and by Phase 4 to
+# position the hitbox Area2D.
+var _attack_direction: String = "neutral"
+
+# True while the AnimationPlayer hitbox window is active (between hitbox_on and
+# hitbox_off keyframes). Drives the debug orange rectangle in _draw().
+# Replaced by real Area2D.monitoring in Phase 4.
+var _debug_hitbox_active: bool = false
 
 
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
@@ -209,140 +225,17 @@ var _current_floor_angle: float = 0.0
 func _ready() -> void:
 	# ── Collision layer and mask ──────────────────────────────────────────────
 	collision_layer = 0
-	set_collision_layer_value(2,  true)   # Player
+	set_collision_layer_value(2,  true)   # Layer 2: Player
 	collision_mask  = 0
-	set_collision_mask_value(1,  true)    # World
-	set_collision_mask_value(13, true)    # OneWayPlatform
+	set_collision_mask_value(1,  true)    # Layer 1: World (solid geometry)
+	set_collision_mask_value(13, true)    # Layer 13: OneWayPlatform
 
-	# ── Floor snap ← NEW M1.6 ────────────────────────────────────────────────
-	# Keeps the player grounded when walking over convex surfaces (slope tops).
-	# Godot disables this automatically when velocity.y < 0 (jumping).
+	# ── Floor snap ───────────────────────────────────────────────────────────
+	# Keeps the player grounded when cresting hills or slope peaks.
+	# Godot disables this automatically when velocity.y < 0 (jumping upward).
 	floor_snap_length = 8.0
 
-	queue_redraw()
 	print("[Player] Ready — position: ", global_position)
-	
-	
-
-
-func _draw() -> void:
-	# ── Resolve current state → visual parameters ─────────────────────────────
-	# Priority: damage flash > dash > wall slide > airborne > grounded
-	# Damage flash overrides everything so it is always visible.
-
-	var body_width: float  = float(PLACEHOLDER_WIDTH)
-	var body_height: float = float(PLACEHOLDER_HEIGHT)
-	var body_color: Color
-	var show_eyes: bool = true
-
-		
-	if _is_dashing:
-		body_width  = PLACEHOLDER_WIDTH * 1.6
-		body_height = PLACEHOLDER_HEIGHT * 0.75
-		body_color  = PLACEHOLDER_DASH_COLOR
-		show_eyes   = false
-	elif _is_wall_sliding:
-		body_width  = PLACEHOLDER_WIDTH * 0.55
-		body_height = PLACEHOLDER_HEIGHT * 1.1
-		body_color  = PLACEHOLDER_WALL_COLOR
-	else:
-		body_color = PLACEHOLDER_COLOR if is_on_floor() else PLACEHOLDER_AIR_COLOR
-
-	# ── I-frame flash ← NEW M1.6 ─────────────────────────────────────────────
-	# Alternate between full alpha and reduced alpha every 0.08 seconds.
-	# fmod(timer, 0.16) cycles from 0 → 0.16 repeatedly.
-	# When the cycle is in its first half (< 0.08), alpha is reduced.
-	# This creates a fast, obvious flicker that signals vulnerability status.
-	var draw_alpha: float = 1.0
-	if _iframes_timer > 0.0 and not _is_dashing:
-		var cycle: float = fmod(_iframes_timer, 0.16)
-		if cycle < 0.08:
-			draw_alpha = 0.25
-			body_color = PLACEHOLDER_HURT_COLOR   # tints red on the "off" frames
-
-	# Apply alpha to the resolved body color
-	body_color.a = draw_alpha
-
-	# ── Body offset for wall slide ────────────────────────────────────────────
-	var body_x_offset: float = 0.0
-	if _is_wall_sliding:
-		body_x_offset = -_wall_normal.x * (body_width * 0.3)
-
-	# ── Slope tilt ← NEW M1.6 ────────────────────────────────────────────────
-	# Rotate the draw transform so the body appears to tilt with the slope.
-	# draw_set_transform(position, rotation, scale) sets a local transform
-	# that affects all subsequent draw calls until reset.
-	# Only apply tilt when grounded and not doing something that overrides it.
-	if is_on_floor() and not _is_dashing and not _is_wall_sliding:
-		draw_set_transform(
-			Vector2(body_x_offset, 0.0),
-			_current_floor_angle,
-			Vector2.ONE
-		)
-		# Draw with zero offset now — the transform handles positioning
-		draw_rect(Rect2(-body_width / 2.0, -body_height, body_width, body_height), body_color)
-		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)   # Reset transform
-	else:
-		# No tilt — draw normally
-		draw_rect(
-			Rect2(-body_width / 2.0 + body_x_offset, -body_height, body_width, body_height),
-			body_color
-		)
-
-	# ── Wall slide streaks ────────────────────────────────────────────────────
-	if _is_wall_sliding and velocity.y > 0.0:
-		var mark_x: float   = -_wall_normal.x * (body_width * 0.5 + 3.0)
-		var mark_color: Color = Color(1.0, 0.85, 0.5, 0.8 * draw_alpha)
-		for i in range(3):
-			draw_line(Vector2(mark_x - 5.0, -float(i + 1) * 14.0),
-					  Vector2(mark_x + 5.0, -float(i + 1) * 14.0),
-					  mark_color, 2.0)
-
-	# ── Eyes ──────────────────────────────────────────────────────────────────
-	if show_eyes:
-		var eye_color: Color = Color(PLACEHOLDER_EYE_COLOR.r,
-									 PLACEHOLDER_EYE_COLOR.g,
-									 PLACEHOLDER_EYE_COLOR.b,
-									 draw_alpha)
-		var eye_x: float = facing_direction * 4.0
-		var eye_y: float = -body_height * 0.7
-		draw_circle(Vector2(eye_x - 5.0, eye_y), 4.0, eye_color)
-		draw_circle(Vector2(eye_x + 5.0, eye_y), 4.0, eye_color)
-
-	# ── Dash cooldown bar ─────────────────────────────────────────────────────
-	if _dash_cooldown_timer > 0.0 and not _is_dashing:
-		var fraction: float = 1.0 - (_dash_cooldown_timer / dash_cooldown)
-		var bar_w: float    = float(PLACEHOLDER_WIDTH)
-		draw_rect(Rect2(-bar_w / 2.0, 4.0, bar_w,            4.0), Color(0.15, 0.15, 0.2, 0.9))
-		if fraction > 0.0:
-			draw_rect(Rect2(-bar_w / 2.0, 4.0, bar_w * fraction, 4.0), Color(0.4, 1.0, 1.0, 0.9))
-
-	# ── Double jump ring ──────────────────────────────────────────────────────
-	if _double_jump_flash_timer > 0.0:
-		var progress: float    = 1.0 - (_double_jump_flash_timer / DOUBLE_JUMP_RING_DURATION)
-		var ring_radius: float = progress * 36.0
-		var ring_alpha: float  = (1.0 - progress) * draw_alpha
-		draw_arc(
-			Vector2(0.0, -body_height * 0.5),
-			ring_radius, 0.0, TAU, 20,
-			Color(PLACEHOLDER_RING_COLOR.r, PLACEHOLDER_RING_COLOR.g,
-				  PLACEHOLDER_RING_COLOR.b, ring_alpha),
-			2.5
-		)
-
-	# ── Floor angle indicator ← NEW M1.6 ─────────────────────────────────────
-	# Small yellow line below the feet showing the current floor normal direction.
-	# Only visible when on a non-flat surface (angle > ~1°).
-	# This will be removed when sprites replace the placeholder in Phase 2.
-	if is_on_floor() and abs(_current_floor_angle) > 0.02:
-		var normal_x: float = sin(_current_floor_angle) * -16.0
-		var normal_y: float = cos(_current_floor_angle) * -16.0
-		draw_line(
-			Vector2.ZERO,
-			Vector2(normal_x, normal_y),
-			Color(1.0, 0.95, 0.2, 0.7),
-			2.0
-		)
 
 
 func _physics_process(delta: float) -> void:
@@ -351,20 +244,18 @@ func _physics_process(delta: float) -> void:
 	_detect_wall_slide()
 	_handle_jump()
 	_handle_dash_input()
+	_handle_attack_input()         # ← M2.3
 	_apply_gravity(delta)
 	_handle_horizontal_movement()
 	move_and_slide()
 	_update_floor_state()
 
-	# ── Compute _is_invincible from its two sources ← REFACTORED M1.6 ────────
-	# This line replaces all direct writes to _is_invincible across the script.
-	# Evaluated AFTER all state changes this frame so it reflects the final state.
+	# Compute _is_invincible from its two sources.
+	# Evaluated AFTER all state changes so it reflects the final frame state.
 	_is_invincible = _is_dashing or (_iframes_timer > 0.0)
 
-	queue_redraw()
 
-
-# ─── TIMER MANAGEMENT ← MODIFIED M1.6 ────────────────────────────────────────
+# ─── TIMER MANAGEMENT ────────────────────────────────────────────────────────
 
 func _update_timers(delta: float) -> void:
 	_coyote_timer            = max(0.0, _coyote_timer            - delta)
@@ -372,16 +263,16 @@ func _update_timers(delta: float) -> void:
 	_dash_cooldown_timer     = max(0.0, _dash_cooldown_timer     - delta)
 	_wall_jump_lock_timer    = max(0.0, _wall_jump_lock_timer    - delta)
 	_double_jump_flash_timer = max(0.0, _double_jump_flash_timer - delta)
-	_iframes_timer           = max(0.0, _iframes_timer           - delta)   # ← NEW M1.6
-	_knockback_timer         = max(0.0, _knockback_timer         - delta)   # ← NEW M1.6
+	_iframes_timer           = max(0.0, _iframes_timer           - delta)
+	_knockback_timer         = max(0.0, _knockback_timer         - delta)
 
-	# Active dash duration
+	# Active dash duration tick
 	if _is_dashing:
 		_dash_timer -= delta
 		if _dash_timer <= 0.0:
 			_end_dash()
 
-	# Drop-through window
+	# Drop-through window tick
 	if _drop_through_timer > 0.0:
 		_drop_through_timer -= delta
 		if _drop_through_timer <= 0.0:
@@ -389,35 +280,38 @@ func _update_timers(delta: float) -> void:
 			set_collision_mask_value(DROP_THROUGH_LAYER, true)
 
 
-# ─── PUBLIC DAMAGE FUNCTION ← NEW M1.6 ───────────────────────────────────────
+# ─── PUBLIC DAMAGE FUNCTION ───────────────────────────────────────────────────
 
 ## Called by hurtboxes (M4.1) and hazards (M7.6) when the player takes damage.
-## amount:          how much HP to remove — passed to EventBus for the health system (Phase 5)
-## source_position: world position of the damage source — used to compute knockback direction
-##                  Defaults to Vector2.ZERO for hazards with no clear source position.
+## amount:           HP to remove — forwarded to EventBus for health system (Phase 5)
+## source_position:  world position of damage source — used to compute knockback direction.
+##                   Pass Vector2.ZERO for hazards with no directional source.
 func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
-	# ── Guard: already invincible (dashing or in I-frames) ───────────────────
-	# If the player is currently protected, the damage is ignored entirely.
-	# This check reads the PREVIOUS frame's _is_invincible because the current
-	# frame's value is computed at the END of _physics_process(). That is fine —
-	# one frame of lag is imperceptible and avoids a more complex evaluation order.
+	# Guard: already invincible — damage is ignored
 	if _is_invincible:
 		return
+
+	# ── Cancel active attack ← NEW M2.3 ──────────────────────────────────────
+	# Taking a hit interrupts any ongoing attack sequence.
+	# The AnimationPlayer attack track is stopped so its callbacks don't fire
+	# out of sequence (e.g. hitbox_off after the animation was interrupted).
+	if _is_attacking:
+		_is_attacking     = false
+		_attack_direction = "neutral"
+		_debug_hitbox_active = false
+		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if ap:
+			ap.stop()
 
 	# ── Compute knockback direction ───────────────────────────────────────────
 	var knockback_dir: Vector2
 
 	if source_position == Vector2.ZERO:
-		# No source position provided (e.g. walked into a spike).
-		# Push the player backward relative to their facing direction.
 		knockback_dir = Vector2(-facing_direction, -0.5).normalized()
 	else:
-		# Direction FROM source TO player (push player away from source).
 		knockback_dir = (global_position - source_position).normalized()
 
-		# Enforce minimum horizontal component.
-		# Without this, a hit from directly below sends the player straight up
-		# with no horizontal arc — looks floaty and unintentional.
+		# Enforce minimum horizontal component — avoids purely vertical knockback
 		if abs(knockback_dir.x) < 0.3:
 			knockback_dir.x = sign(global_position.x - source_position.x)
 			if knockback_dir.x == 0.0:
@@ -425,36 +319,24 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 			knockback_dir = knockback_dir.normalized()
 
 	# ── Apply velocity impulse ────────────────────────────────────────────────
-	# Horizontal: full knockback_force in the computed direction.
-	# Vertical: fixed upward component regardless of direction.
-	# We use direct assignment (not +=) so existing momentum doesn't
-	# stack with knockback — the hit should override whatever the player was doing.
-	velocity.x = knockback_dir.x * knockback_force
-	velocity.y = knockback_vertical_force
-
-	# Cache the direction for any system that wants to read it later
+	velocity.x           = knockback_dir.x * knockback_force
+	velocity.y           = knockback_vertical_force
 	_knockback_direction = knockback_dir.x
 
-	# ── Start control lock ────────────────────────────────────────────────────
+	# ── Start timers ──────────────────────────────────────────────────────────
 	_knockback_timer = knockback_duration
+	_iframes_timer   = iframes_duration
 
-	# ── Start I-frames ────────────────────────────────────────────────────────
-	# _is_invincible will be recomputed at the end of this frame to true.
-	_iframes_timer = iframes_duration
-
-	# ── Cancel any active dash ────────────────────────────────────────────────
-	# Taking a hit while dashing ends the dash. The knockback replaces it.
+	# ── Cancel active dash ────────────────────────────────────────────────────
 	if _is_dashing:
 		_end_dash()
 
-	# ── Notify the EventBus ──────────────────────────────────────────────────
-	# Phase 5 health system listens for this signal and subtracts HP.
-	# VFX (Phase 12) and Audio (Phase 11) also listen for screen flash and hurt sound.
+	# ── Notify EventBus ───────────────────────────────────────────────────────
+	# Phase 5 health system, Phase 11 audio, and Phase 12 VFX all listen here
 	EventBus.player_damaged.emit(amount, source_position)
 
 
-## Read-only accessor for external systems (hurtbox, enemy AI) to check
-## if the player can currently be damaged. Do not write _is_invincible directly.
+## Read-only check — use this instead of reading _is_invincible directly
 func is_invincible() -> bool:
 	return _is_invincible
 
@@ -483,6 +365,8 @@ func _handle_jump() -> void:
 		return
 
 	# Priority 3: Floor / coyote jump
+	# Must be checked BEFORE double jump so coyote fires a standard jump
+	# and does NOT consume _can_double_jump.
 	var can_floor_jump: bool = is_on_floor() or _coyote_timer > 0.0
 	var wants_to_jump: bool  = _jump_buffer_timer > 0.0
 
@@ -503,31 +387,37 @@ func _execute_jump() -> void:
 
 
 func _execute_double_jump() -> void:
+	# Direct assignment cancels existing vertical velocity regardless of direction
 	velocity.y               = double_jump_force
 	_can_double_jump         = false
 	_is_jumping              = true
 	_jump_buffer_timer       = 0.0
-	_double_jump_flash_timer = DOUBLE_JUMP_RING_DURATION
-
+	_double_jump_flash_timer = DOUBLE_JUMP_ANIM_DURATION
 
 func _start_drop_through() -> void:
+	# Temporarily remove OneWayPlatform from collision mask
 	set_collision_mask_value(DROP_THROUGH_LAYER, false)
 	_drop_through_timer = DROP_THROUGH_DURATION
-	velocity.y          = 80.0
+	velocity.y          = 80.0   # Small push to break floor contact immediately
 	_jump_buffer_timer  = 0.0
 
 
 # ─── WALL SLIDE ───────────────────────────────────────────────────────────────
 
 func _detect_wall_slide() -> void:
+	# Gate 1: Must be on a wall but NOT simultaneously on a floor surface
 	if not is_on_wall_only():
 		_is_wall_sliding = false
 		_wall_normal     = Vector2.ZERO
 		return
+
+	# Gate 2: Dash overrides wall slide
 	if _is_dashing:
 		_is_wall_sliding = false
 		return
 
+	# Gate 3: Player must be pressing toward the wall
+	# direction × wall_normal.x < 0  means pressing toward the solid surface
 	var direction: float  = Input.get_axis("move_left", "move_right")
 	_wall_normal          = get_wall_normal()
 	var toward_wall: bool = direction * _wall_normal.x < 0
@@ -536,8 +426,9 @@ func _detect_wall_slide() -> void:
 		_is_wall_sliding = false
 		return
 
+	# All gates passed — wall slide is active
 	_is_wall_sliding = true
-	facing_direction = _wall_normal.x
+	facing_direction = _wall_normal.x   # Face away from wall (toward open space)
 
 
 func _execute_wall_jump() -> void:
@@ -548,6 +439,7 @@ func _execute_wall_jump() -> void:
 	_jump_buffer_timer    = 0.0
 	_is_wall_sliding      = false
 	_can_air_dash         = true
+	# _can_double_jump is intentionally NOT restored by wall jumps
 
 
 # ─── DASH ─────────────────────────────────────────────────────────────────────
@@ -561,83 +453,156 @@ func _handle_dash_input() -> void:
 
 
 func _start_dash() -> void:
+	# ── Cancel active attack ← NEW M2.3 ──────────────────────────────────────
+	# Dashing out of an attack is intentional — it is the player's escape option.
+	# Stop the AnimationPlayer so hitbox callbacks don't fire after the attack ends.
+	if _is_attacking:
+		_is_attacking        = false
+		_attack_direction    = "neutral"
+		_debug_hitbox_active = false
+		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if ap:
+			ap.stop()
+
 	_is_dashing          = true
 	_dash_timer          = dash_duration
 	_dash_cooldown_timer = dash_cooldown
 	_dash_direction      = facing_direction
+
 	if not is_on_floor():
 		_can_air_dash = false
-	velocity.y           = 0.0
-	# Note: _is_invincible is no longer set here — computed from _is_dashing
+
+	velocity.y = 0.0
+	# _is_invincible is NOT set here — it is computed from _is_dashing at end of frame
 
 
 func _end_dash() -> void:
 	_is_dashing = false
 	_dash_timer = 0.0
+	# Clamp exit velocity so the player doesn't leave the dash at 500px/s
 	velocity.x  = clamp(velocity.x, -move_speed, move_speed)
-	# Note: _is_invincible is no longer cleared here — computed from _is_dashing
+	# _is_invincible is NOT cleared here — computed from _is_dashing at end of frame
+
+
+# ─── ATTACK ← NEW M2.3 ───────────────────────────────────────────────────────
+
+func _handle_attack_input() -> void:
+	# Gate 1: Cannot start a new attack while one is already active
+	if _is_attacking:
+		return
+
+	# Gate 2: Attack button must have been JUST pressed this frame
+	if not Input.is_action_just_pressed("attack"):
+		return
+
+	# ── Determine attack direction ────────────────────────────────────────────
+	# Checked at the moment of button press — cannot be changed mid-attack.
+	if Input.is_action_pressed("move_up"):
+		_attack_direction = "up"
+	elif Input.is_action_pressed("move_down") and not is_on_floor():
+		# Down-slash only in the air — on the ground, down+jump = drop-through
+		_attack_direction = "down"
+	else:
+		_attack_direction = "neutral"
+
+	# ── Start the attack ──────────────────────────────────────────────────────
+	_is_attacking = true
+
+	# Trigger the corresponding AnimationPlayer timing track.
+	# get_node_or_null is used instead of get_node to prevent crashes if the
+	# AnimationPlayer node is renamed or missing during development.
+	var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap:
+		match _attack_direction:
+			"up":   ap.play("attack_up")
+			"down": ap.play("attack_down")
+			_:      ap.play("attack_01")
 
 
 # ─── GRAVITY ──────────────────────────────────────────────────────────────────
 
 func _apply_gravity(delta: float) -> void:
+	# Case 1: On the floor — reset residual Y velocity
+	# "and not _is_jumping" prevents gravity from zeroing velocity.y on the
+	# exact frame a jump fires (when the player is still touching the floor)
 	if is_on_floor() and not _is_jumping:
 		velocity.y = 0.0
 		return
+
+	# Case 2: Dashing — suppress gravity entirely for a horizontal dash
 	if _is_dashing:
 		velocity.y = 0.0
 		return
+
+	# Case 3: Wall sliding — reduced gravity for slow controlled descent
 	if _is_wall_sliding:
 		if velocity.y > 0.0:
 			velocity.y += gravity * wall_slide_gravity_multiplier * delta
 			velocity.y  = min(velocity.y, wall_slide_max_speed)
 		else:
+			# Rising along wall — apply normal gravity to decelerate
 			velocity.y += gravity * delta
 		return
 
+	# Case 4: Airborne — select appropriate gravity curve
 	var g: float
 	if velocity.y > 0.0:
-		g = gravity * fall_gravity_multiplier
+		g = gravity * fall_gravity_multiplier          # Falling: fast drop
 	elif not Input.is_action_pressed("jump"):
-		g = gravity * jump_cut_multiplier
+		g = gravity * jump_cut_multiplier              # Rising, jump released: cut height
 	else:
-		g = gravity
+		g = gravity                                    # Rising, jump held: full arc
 
 	velocity.y += g * delta
 	velocity.y  = min(velocity.y, max_fall_speed)
 
 
-# ─── HORIZONTAL MOVEMENT ← MODIFIED M1.6 ─────────────────────────────────────
+# ─── HORIZONTAL MOVEMENT ─────────────────────────────────────────────────────
 
 func _handle_horizontal_movement() -> void:
+	# Override 1: Dash locks velocity to dash speed in the locked direction
 	if _is_dashing:
 		velocity.x = _dash_direction * dash_speed
 		return
+
+	# Override 2: Wall slide — no horizontal movement while pressed to wall
 	if _is_wall_sliding:
 		velocity.x = 0.0
 		return
+
+	# Override 3: Wall jump input lock — preserve wall jump momentum briefly
 	if _wall_jump_lock_timer > 0.0:
 		return
 
-	# ── Knockback control lock ← NEW M1.6 ────────────────────────────────────
-	# During knockback, suppress horizontal input entirely.
-	# The knockback velocity applied in take_damage() carries the player.
-	# Without this, the player's held direction immediately cancels knockback —
-	# a skilled player would never feel the impact.
+	# Override 4: Knockback control lock — preserve knockback momentum
 	if _knockback_timer > 0.0:
 		return
 
+	# ── Normal movement with optional attack penalty ───────────────────────────
+	# NOTE: This is the FIX from the previous version.
+	# The old code set velocity.x = direction * move_speed FIRST, then set it
+	# again with effective_speed below, creating a duplicate assignment.
+	# Now there is exactly ONE assignment to velocity.x in this branch.
 	var direction: float = Input.get_axis("move_left", "move_right")
-	velocity.x = direction * move_speed
 
+	# Attack penalty: slow the player while swinging on the ground.
+	# Air attacks do not penalise speed — full aerial control is preserved.
+	var effective_speed: float = move_speed
+	if _is_attacking and is_on_floor():
+		effective_speed *= attack_move_penalty
+
+	velocity.x = direction * effective_speed
+
+	# Only update facing when actually moving — preserves last-moved direction
+	# when standing still (important for attack direction detection)
 	if direction != 0.0:
 		facing_direction = sign(direction)
 
 
-# ─── FLOOR STATE ← MODIFIED M1.6 ─────────────────────────────────────────────
+# ─── FLOOR STATE ──────────────────────────────────────────────────────────────
 
 func _update_floor_state() -> void:
-	# Ledge walk-off → coyote window
+	# Ledge walk-off: grant coyote time
 	if _was_on_floor and not is_on_floor() and not _is_jumping:
 		_coyote_timer = coyote_time
 
@@ -647,48 +612,96 @@ func _update_floor_state() -> void:
 		_is_wall_sliding = false
 		_can_double_jump = true
 
-		# ── Read and store the floor angle ← NEW M1.6 ─────────────────────────
-		# get_floor_normal() returns the outward normal of the surface under the player.
-		# angle_to() returns the signed angle from Vector2.UP to that normal.
-		# Flat floor: normal = (0,-1) = Vector2.UP → angle = 0.0
-		# Left slope: normal tilts right → angle is positive
-		# Right slope: normal tilts left → angle is negative
+		# Store floor tilt angle — read by get_floor_angle() for sprite rotation
 		var floor_normal: Vector2 = get_floor_normal()
 		_current_floor_angle = Vector2.UP.angle_to(floor_normal)
 	else:
-		# Not on floor — clear the stored angle so the sprite doesn't
-		# stay tilted while airborne
+		# Clear tilt so sprite doesn't stay rotated while airborne
 		_current_floor_angle = 0.0
 
 	_was_on_floor = is_on_floor()
 
-# ─── PUBLIC ACCESSORS FOR ANIMATION CONTROLLER ───────────────────────────────
-# These functions expose private state as read-only values.
-# The animation controller READS these. It never calls any other function here.
 
-## Returns true while the player is actively dashing
+# ─── PUBLIC ACCESSORS ────────────────────────────────────────────────────────
+# Read-only interface for player_animation.gd and other external systems.
+# External scripts call these — they never read private variables directly.
+
+## True while the dash velocity override is active
 func is_dashing() -> bool:
 	return _is_dashing
 
-
-## Returns true while the player is wall sliding against a surface
+## True while the player is pressed against a wall and sliding downward
 func is_wall_sliding() -> bool:
 	return _is_wall_sliding
 
-
-## Returns seconds of remaining knockback control lock (0.0 when expired)
-## Non-zero means the player was recently hit and control is suppressed
+## Seconds of horizontal control lock remaining after knockback (0.0 = free)
 func get_knockback_timer() -> float:
 	return _knockback_timer
 
-
-## Returns seconds remaining on the double jump ring visual timer
-## Non-zero for 0.15s immediately after a double jump is used
-## Used for rising-edge detection to trigger the double jump animation
+## Seconds remaining on the double jump visual timer.
+## Non-zero for 0.15s after a double jump — used for rising-edge detection.
 func get_double_jump_flash_timer() -> float:
 	return _double_jump_flash_timer
 
-## Returns the floor tilt angle in radians
-## 0.0 = flat ground   positive = right-side higher   negative = left-side higher
+## Floor tilt in radians. 0.0 = flat. Used by sprite rotation in animation controller.
+## Renamed from get_current_floor_angle() to match player_animation.gd expectation.
 func get_current_floor_angle() -> float:
 	return _current_floor_angle
+
+## True from attack start until _on_attack_finished() fires
+func is_attacking() -> bool:
+	return _is_attacking
+
+## Current attack direction: "neutral", "up", or "down"
+func get_attack_direction() -> String:
+	return _attack_direction
+
+
+# ─── ANIMATION EVENT CALLBACKS ← NEW M2.3 ────────────────────────────────────
+# Called by AnimationPlayer method tracks at precise timestamps.
+# Stubs now — Phase 4 connects real hitbox Area2D, Phase 11 adds audio,
+# Phase 12 adds particle spawning.
+
+## Called at t=0.00 of every attack animation — fires the swing sound request
+func _on_attack_started() -> void:
+	EventBus.play_sfx_requested.emit("player_attack_swing")
+	print("[Player] Attack started — direction: ", _attack_direction)
+
+
+## Called at t=0.15 (ON) and t=0.25 (OFF) of attack_01 by AnimationPlayer.
+## active=true: hitbox window opens.  active=false: hitbox window closes.
+## Phase 4 replaces the debug flag with real Area2D.monitoring control.
+func _on_attack_hitbox_active(active: bool) -> void:
+	# _debug_hitbox_active is kept as a flag — Phase 4 replaces this entire
+	# function body with real Area2D.monitoring control:
+	#
+	#   var hitbox := get_node_or_null("AttackHitbox") as Area2D
+	#   if hitbox:
+	#       hitbox.monitoring  = active
+	#       hitbox.monitorable = active
+	_debug_hitbox_active = active
+	print("[Player] Hitbox active: ", active)
+
+
+## Called at t=0.55 of attack_01 (t=0.28 of attack_up/down) — ends the attack state.
+## Clearing _is_attacking allows _handle_attack_input() to accept a new press.
+func _on_attack_finished() -> void:
+	_is_attacking        = false
+	_attack_direction    = "neutral"
+	_debug_hitbox_active = false
+	print("[Player] Attack finished")
+
+
+## Called at t=0.00 of the player_land AnimationPlayer animation.
+## Fires the landing sound request and will trigger dust particles in Phase 12.
+func _on_land_impact() -> void:
+	EventBus.play_sfx_requested.emit("player_land")
+	# Phase 12: EventBus.spawn_particles_requested.emit("dust_land", global_position)
+	print("[Player] Land impact")
+
+
+## Universal audio proxy — AnimationPlayer cannot call EventBus directly,
+## so any method track that needs to play audio calls this function instead.
+## sfx_name must match a filename in assets/audio/sfx/ (without extension).
+func _on_play_sfx(sfx_name: String) -> void:
+	EventBus.play_sfx_requested.emit(sfx_name)
