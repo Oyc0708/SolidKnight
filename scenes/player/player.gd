@@ -112,7 +112,6 @@ extends CharacterBody2D
 ## 1.0 = no penalty.  Air attacks are always full speed (penalty only applies on floor).
 @export var attack_move_penalty: float = 0.6
 
-
 # ─── PHYSICS LAYER CONSTANTS ─────────────────────────────────────────────────
 
 ## Layer number for one-way (drop-through) platforms
@@ -218,7 +217,6 @@ var _attack_direction: String = "neutral"
 # hitbox_off keyframes). Drives the debug orange rectangle in _draw().
 # Replaced by real Area2D.monitoring in Phase 4.
 var _debug_hitbox_active: bool = false
-
 
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 

@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://cni7k1651hoet" path="res://scripts/managers/test_wall.gd" id="4_v45ci"]
 [ext_resource type="Script" uid="uid://ukqnmwvfp2dl" path="res://scripts/managers/test_one_way_platform.gd" id="5_48ne7"]
 [ext_resource type="Script" uid="uid://ba8p4w38l5j83" path="res://scripts/managers/test_slope.gd" id="6_6xh4u"]
+[ext_resource type="PackedScene" uid="uid://7xubr0dxu3ku" path="res://scenes/hud/player_hud.tscn" id="7_cyt5c"]
+[ext_resource type="PackedScene" uid="uid://sqe7a4i06hp1" path="res://scenes/menus/pause_menu.tscn" id="8_7x1jh"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_fr1um"]
 
@@ -120,3 +122,7 @@ slope_color = Color(0.4, 0.38039216, 0.52156866, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SlopeSteep" unique_id=682729057]
 shape = SubResource("RectangleShape2D_di6hr")
+
+[node name="PauseMenu" parent="." unique_id=917024324 instance=ExtResource("8_7x1jh")]
+
+[node name="PlayerHud" parent="." unique_id=1738001189 instance=ExtResource("7_cyt5c")]
