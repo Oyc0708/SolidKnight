@@ -23,3 +23,5 @@ animation = &"jump_fall"
 script = ExtResource("3_gmlin")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=958145430]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1691665212]
