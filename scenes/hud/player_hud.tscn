@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://7xubr0dxu3ku"]
+
+[ext_resource type="Script" uid="uid://bd8yulrongsf3" path="res://scenes/hud/heart_container.gd" id="1_0fsuj"]
+[ext_resource type="Texture2D" uid="uid://cd8d4b0fb22t3" path="res://assets/ui/hud/Heart_Full.png" id="2_cfmin"]
+
+[sub_resource type="GDScript" id="GDScript_0fsuj"]
+script/source = "extends CanvasLayer
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[node name="PlayerHud" type="CanvasLayer" unique_id=1738001189]
+process_mode = 3
+script = SubResource("GDScript_0fsuj")
+
+[node name="heart" type="Control" parent="." unique_id=1579743770]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeartContainer" type="HBoxContainer" parent="heart" unique_id=1823044770]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 48.0
+offset_right = 156.0
+offset_bottom = 97.2
+scale = Vector2(2.5, 2.5)
+theme_override_constants/separation = 7
+script = ExtResource("1_0fsuj")
+
+[node name="Heart_Full" type="TextureRect" parent="heart/HeartContainer" unique_id=668677543]
+layout_mode = 2
+texture = ExtResource("2_cfmin")
+stretch_mode = 2
+
+[node name="Heart_Full2" type="TextureRect" parent="heart/HeartContainer" unique_id=757120795]
+layout_mode = 2
+texture = ExtResource("2_cfmin")
+stretch_mode = 2
+
+[node name="Heart_Full3" type="TextureRect" parent="heart/HeartContainer" unique_id=669398126]
+layout_mode = 2
+texture = ExtResource("2_cfmin")
+stretch_mode = 2
+
+[node name="Heart_Full4" type="TextureRect" parent="heart/HeartContainer" unique_id=779861883]
+layout_mode = 2
+texture = ExtResource("2_cfmin")
+stretch_mode = 2
+
+[node name="Heart_Full5" type="TextureRect" parent="heart/HeartContainer" unique_id=526229191]
+layout_mode = 2
+texture = ExtResource("2_cfmin")
+stretch_mode = 2

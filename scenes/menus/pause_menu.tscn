@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://sqe7a4i06hp1"]
+
+[ext_resource type="Script" uid="uid://7l2jn85jjy3x" path="res://scenes/menus/pause_menu.gd" id="1_fwndu"]
+[ext_resource type="Texture2D" uid="uid://cqp2qccbxyh8a" path="res://assets/ui/pause_button.png" id="2_7unhi"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xrivr"]
+atlas = ExtResource("2_7unhi")
+region = Rect2(223.29755, -0.0065258145, 17.385803, 16.392323)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_13qdw"]
+atlas = ExtResource("2_7unhi")
+region = Rect2(239.72803, 1.3535237, 16.805298, 15.429451)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gdsik"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=917024324 node_paths=PackedStringArray("pause_panel")]
+process_mode = 3
+script = ExtResource("1_fwndu")
+pause_panel = NodePath("Control/PausePanel")
+
+[node name="Control" type="Control" parent="." unique_id=1920734756]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseButton" type="TextureButton" parent="Control" unique_id=792177063]
+layout_mode = 0
+offset_left = 1152.0
+offset_top = 32.0
+offset_right = 1242.0
+offset_bottom = 106.0
+texture_normal = SubResource("AtlasTexture_xrivr")
+texture_pressed = SubResource("AtlasTexture_13qdw")
+stretch_mode = 5
+
+[node name="PausePanel" type="Panel" parent="Control" unique_id=343367511]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/PausePanel" unique_id=1572997136]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -96.5
+offset_top = -104.5
+offset_right = 96.5
+offset_bottom = 104.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="ResumeButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=1599455442]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
+text = "Resume "
+
+[node name="RestartButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=652086696]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
+text = "Restart "
+
+[node name="SettingsButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=2111861203]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
+text = "Settings"
+
+[node name="MainMenuButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=930575579]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 23
+theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
+text = "Main Menu "
+
+[node name="Label" type="Label" parent="Control/PausePanel" unique_id=301963550]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -97.0
+offset_top = 167.0
+offset_right = 96.0
+offset_bottom = 209.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "PAUSED"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Control/PauseButton" to="." method="_on_pause_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]

@@ -39,6 +39,7 @@ var is_paused: bool = false
 
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 func _ready() -> void:
+	process_mode = PROCESS_MODE_ALWAYS
 	print("[GameManager] Ready — state: ", State.keys()[current_state])
 
 

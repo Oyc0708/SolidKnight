@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://b81r447xy7d3f"]
+
+[ext_resource type="Texture2D" uid="uid://bn2g8am8cj5n8" path="res://assets/backgrounds/main_menu background.jpg" id="1_2o76q"]
+[ext_resource type="Script" uid="uid://d32nb7qtxc5ql" path="res://scenes/menus/main_menu.gd" id="1_6bivr"]
+[ext_resource type="FontFile" uid="uid://ct2gd77blrh1f" path="res://assets/fonts/Combo-Regular.ttf" id="1_ovrgc"]
+[ext_resource type="FontFile" uid="uid://d3f2jrt3nbajo" path="res://assets/fonts/AlmendraSC-Regular.ttf" id="1_xqga4"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2o76q"]
+texture = ExtResource("1_2o76q")
+modulate_color = Color(0.70380783, 0.70380783, 0.70380783, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xqga4"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="MainMenu" type="Control" unique_id=1442169281]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6bivr")
+
+[node name="Panel" type="Panel" parent="." unique_id=1933249123]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -6.1035156e-05
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_2o76q")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1396963622]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -153.0
+offset_top = -69.0
+offset_right = 150.0
+offset_bottom = 126.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Start button" type="Button" parent="VBoxContainer" unique_id=1974195853]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Start game"
+
+[node name="Settings button" type="Button" parent="VBoxContainer" unique_id=141040021]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Settings"
+
+[node name="Exit button" type="Button" parent="VBoxContainer" unique_id=2087139298]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Exit"
+
+[node name="Label" type="Label" parent="." unique_id=2068365959]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -316.0
+offset_top = 75.0
+offset_right = 323.0
+offset_bottom = 225.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("1_xqga4")
+theme_override_font_sizes/font_size = 120
+text = "SolidKnight"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="VBoxContainer/Start button" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="VBoxContainer/Settings button" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="VBoxContainer/Exit button" to="." method="_on_exit_pressed"]
