@@ -273,6 +273,9 @@ func _play_locked(anim_name: String) -> void:
 	## The cascade returns early on every frame until animation_finished fires.
 	if _locked_anim == anim_name:
 		return   # Already locked on this animation — do not restart it
+	if not sprite_frames.has_animation(anim_name):   # ADDED: guard against missing animations
+		push_warning("[PlayerAnimation] Missing animation: " + anim_name)   # ADDED
+		return   # ADDED: don't lock onto something that can't play
 	_locked_anim = anim_name
 	play(anim_name)
 

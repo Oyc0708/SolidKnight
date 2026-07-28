@@ -415,7 +415,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sngk0")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"double_jump",
 "speed": 12.0
 }, {

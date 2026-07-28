@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://dks3vj2ocyya5" path="res://scripts/managers/test_ground.gd" id="1_jbqir"]
 [ext_resource type="Script" uid="uid://wg2ylam521ca" path="res://scripts/managers/test_platform.gd" id="2_yautc"]
-[ext_resource type="PackedScene" uid="uid://dxgtr3egk55au" path="res://scenes/player/player.tscn" id="3_fr1um"]
 [ext_resource type="Script" uid="uid://cni7k1651hoet" path="res://scripts/managers/test_wall.gd" id="4_v45ci"]
 [ext_resource type="Script" uid="uid://ukqnmwvfp2dl" path="res://scripts/managers/test_one_way_platform.gd" id="5_48ne7"]
 [ext_resource type="Script" uid="uid://ba8p4w38l5j83" path="res://scripts/managers/test_slope.gd" id="6_6xh4u"]
@@ -68,12 +67,6 @@ script = ExtResource("2_yautc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Platform" unique_id=450430827]
 shape = SubResource("RectangleShape2D_st1g6")
-
-[node name="Player" parent="." unique_id=422246210 instance=ExtResource("3_fr1um")]
-position = Vector2(0, 100)
-
-[node name="Camera2D2" type="Camera2D" parent="Player" unique_id=218585631]
-position_smoothing_enabled = true
 
 [node name="HighPlatform" type="StaticBody2D" parent="." unique_id=1210591477]
 position = Vector2(400, 150)
