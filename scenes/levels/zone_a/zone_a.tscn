@@ -2,6 +2,10 @@
 
 [ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="1_oshi1"]
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="2_juxns"]
+[ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_42wgk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jbet7"]
+size = Vector2(3104, 1789)
 
 [node name="ZoneA" type="Node2D" unique_id=1292466249]
 
@@ -34,3 +38,12 @@ tile_set = ExtResource("2_juxns")
 collision_enabled = false
 
 [node name="RoomInstance" parent="." unique_id=886423592 instance=ExtResource("1_oshi1")]
+
+[node name="CameraZone" type="Area2D" parent="." unique_id=1129512440]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("3_42wgk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone" unique_id=1224784214]
+position = Vector2(1295, -253.5)
+shape = SubResource("RectangleShape2D_jbet7")

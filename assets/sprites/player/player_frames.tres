@@ -348,17 +348,17 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_luav2")
 }],
-"loop": 0,
+"loop": false,
 "name": &"attack_01",
 "speed": 20.0
 }, {
 "frames": [],
-"loop": 1,
+"loop": true,
 "name": &"attack_down",
 "speed": 5.0
 }, {
 "frames": [],
-"loop": 1,
+"loop": true,
 "name": &"attack_up",
 "speed": 5.0
 }, {
@@ -366,7 +366,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_pexeo")
 }],
-"loop": 1,
+"loop": true,
 "name": &"dash",
 "speed": 5.0
 }, {
@@ -392,7 +392,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_vi1o5")
 }],
-"loop": 1,
+"loop": true,
 "name": &"dead",
 "speed": 10.0
 }, {
@@ -415,7 +415,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_sngk0")
 }],
-"loop": 0,
+"loop": false,
 "name": &"double_jump",
 "speed": 12.0
 }, {
@@ -441,7 +441,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qc352")
 }],
-"loop": 1,
+"loop": true,
 "name": &"hurt",
 "speed": 10.0
 }, {
@@ -479,7 +479,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_cko3t")
 }],
-"loop": 1,
+"loop": true,
 "name": &"idle",
 "speed": 10.0
 }, {
@@ -487,7 +487,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jjqt6")
 }],
-"loop": 1,
+"loop": true,
 "name": &"jump_fall",
 "speed": 10.0
 }, {
@@ -495,7 +495,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xi14b")
 }],
-"loop": 1,
+"loop": true,
 "name": &"jump_rise",
 "speed": 10.0
 }, {
@@ -536,7 +536,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_e7k76")
 }],
-"loop": 1,
+"loop": true,
 "name": &"run",
 "speed": 15.0
 }, {
@@ -577,7 +577,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5vjwi")
 }],
-"loop": 1,
+"loop": true,
 "name": &"walk",
 "speed": 10.0
 }, {
@@ -597,7 +597,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fex7a")
 }],
-"loop": 1,
+"loop": true,
 "name": &"wall_slide",
 "speed": 8.0
 }]

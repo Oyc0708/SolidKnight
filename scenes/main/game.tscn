@@ -5,12 +5,32 @@
 [ext_resource type="PackedScene" uid="uid://sqe7a4i06hp1" path="res://scenes/menus/pause_menu.tscn" id="4_gf1f2"]
 [ext_resource type="PackedScene" uid="uid://7xubr0dxu3ku" path="res://scenes/hud/player_hud.tscn" id="4_gsayk"]
 
+[sub_resource type="GDScript" id="GDScript_gsayk"]
+script/source = "extends Camera2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
 [node name="Game" type="Node2D" unique_id=1132983403]
 script = ExtResource("1_ma5rq")
 starting_room = "uid://bcvcw6tgrbkr2"
 
 [node name="Player" parent="." unique_id=422246210 instance=ExtResource("1_e64el")]
 
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player" unique_id=1576691063]
+remote_path = NodePath("../../Camera2D")
+
 [node name="PauseMenu" parent="." unique_id=917024324 instance=ExtResource("4_gf1f2")]
 
 [node name="PlayerHud" parent="." unique_id=1738001189 instance=ExtResource("4_gsayk")]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1400915417]
+script = SubResource("GDScript_gsayk")
