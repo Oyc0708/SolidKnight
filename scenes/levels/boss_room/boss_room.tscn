@@ -8,16 +8,16 @@
 [node name="RoomInstance" parent="." unique_id=1300821533 instance=ExtResource("1_dxuby")]
 
 [node name="Hazards" type="Node2D" parent="." unique_id=1672520259]
-position = Vector2(385.83643, 233.83789)
+position = Vector2(720.09485, 495.3853)
 
 [node name="Enemies" type="Node2D" parent="." unique_id=1847326698]
-position = Vector2(385.83643, 233.83789)
+position = Vector2(1045, 560)
 
 [node name="Checkpoints" type="Node2D" parent="." unique_id=509300861]
-position = Vector2(385.83643, 233.83789)
+position = Vector2(631, 632)
 
 [node name="SpawnPoints" type="Node2D" parent="." unique_id=1533892377]
-position = Vector2(385.83643, 233.83789)
+position = Vector2(947, 613)
 
 [node name="TileMap" type="Node2D" parent="." unique_id=823255707]
 

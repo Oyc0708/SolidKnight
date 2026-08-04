@@ -8,6 +8,7 @@ class_name Game
 func _ready() -> void:
 	# Make this script easily reachable from anywhere
 	get_script().set_meta(&"singleton", self)
+	add_to_group(&"game")
 
 	# 1. Reset & initialise the map data (ONLY ONCE per session)
 	MetSys.reset_state()
@@ -19,17 +20,40 @@ func _ready() -> void:
 	# 3. Add the built‑in room‑transition module
 	add_module("RoomTransitions.gd")
 
+	# Connect before loading because load_room() can complete immediately.
+	room_loaded.connect(_on_room_loaded)
+
 	# 4. Load the first room
 	load_room(starting_room)
-
-	# Optional: emit your own event when a room finishes loading
-	room_loaded.connect(_on_room_loaded)
 	
 	#Debug Test
 	print("[Game] Loaded room: ", starting_room)
 	print("[Game] Current room instance: ", MetSys.get_current_room_instance())
 func _on_room_loaded() -> void:
 	EventBus.room_transition_finished.emit()
+
+
+## Loads a MetSys room without destroying the persistent player, HUD, or menus.
+func transition_to_room(room_path: String, spawn_marker_name: String = "") -> void:
+	if room_path.is_empty() or map_changing:
+		return
+	if not ResourceLoader.exists(room_path):
+		push_error("[Game] Room not found: " + room_path)
+		return
+
+	GameManager.set_state(GameManager.State.LOADING)
+	EventBus.room_transition_started.emit(room_path)
+	await load_room(room_path)
+
+	if not spawn_marker_name.is_empty():
+		var spawn_marker := map.find_child(spawn_marker_name, true, false) as Marker2D
+		if spawn_marker:
+			player.global_position = spawn_marker.global_position
+		else:
+			push_warning("[Game] Spawn marker not found: " + spawn_marker_name)
+
+	GameManager.pending_spawn_marker = ""
+	GameManager.set_state(GameManager.State.PLAYING)
 
 # Helper so other scripts can find this instance
 static func get_singleton() -> Game:

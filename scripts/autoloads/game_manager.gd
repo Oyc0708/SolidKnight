@@ -1,20 +1,6 @@
-# game_manager.gd
-# ─────────────────────────────────────────────────────────────────────────────
-# Tracks what state the game is currently in.
-# Controls pausing.
-# Acts as the source of truth for "what is the player allowed to do right now?"
-#
-# HOW TO USE FROM ANY SCRIPT:
-#   GameManager.set_state(GameManager.State.PAUSED)
-#   if GameManager.current_state == GameManager.State.PLAYING: ...
-# ─────────────────────────────────────────────────────────────────────────────
+## Global gameplay state, checkpoint state, and respawn orchestration.
 extends Node
 
-
-# ─── STATE ENUM ──────────────────────────────────────────────────────────────
-# An enum is a named list of integer constants.
-# GameManager.State.PLAYING is cleaner and safer than using raw numbers.
-# "cleaner" = you read the name; "safer" = typos cause errors, not silent bugs
 enum State {
 	LOADING,    # A scene is loading — input should be ignored
 	PLAYING,    # Normal gameplay — full player control
@@ -25,7 +11,6 @@ enum State {
 	DEAD,       # Player just died — waiting for respawn sequence
 }
 
-
 # ─── VARIABLES ───────────────────────────────────────────────────────────────
 # The state the game is currently in
 # We start in LOADING and change to PLAYING once the first scene is ready
@@ -34,67 +19,106 @@ var current_state: State = State.PLAYING
 # Whether the game engine is paused
 # Godot's pause system stops _process() and _physics_process() on all
 # nodes UNLESS they have process_mode set to "Always"
-var is_paused: bool = false
+var is_paused := false
 
+var last_checkpoint_id := ""
+var last_checkpoint_position := Vector2.ZERO
+var last_checkpoint_room := ""
+
+## Retained for scripts/UI that need to know the active arrival marker.
+var pending_spawn_marker := ""
 
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
-	print("[GameManager] Ready — state: ", State.keys()[current_state])
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	# Listen for the pause button from anywhere in the game
-	# _unhandled_input only fires if no other node consumed the event first
+func _unhandled_input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("pause"):
 		toggle_pause()
 
-
-# ─── PUBLIC FUNCTIONS ─────────────────────────────────────────────────────────
+# ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 ## Changes the game state and notifies all listeners via EventBus
 func set_state(new_state: State) -> void:
 	if current_state == new_state:
-		return  # Nothing to do — already in this state
-	
+		return
 	current_state = new_state
-	
-	# Notify the rest of the game — UI, enemies, player all listen for this
 	EventBus.game_state_changed.emit(new_state)
-	
-	print("[GameManager] State → ", State.keys()[new_state])
-
 
 ## Returns true if the player currently has full control
 func is_playing() -> bool:
 	return current_state == State.PLAYING
 
-
 ## Freeze the game and open the pause menu
 func pause_game() -> void:
 	if is_paused:
-		return  # Already paused, do nothing
-	
+		return
 	is_paused = true
-	get_tree().paused = true  # This is Godot's built-in pause signal
-							  # Stops _physics_process on all nodes by default
+	get_tree().paused = true
 	set_state(State.PAUSED)
 	EventBus.game_paused.emit()
 
-
-## Unfreeze the game and close the pause menu
+## Toggle between paused and playing
 func unpause_game() -> void:
 	if not is_paused:
-		return  # Not paused, do nothing
-	
+		return
 	is_paused = false
 	get_tree().paused = false
 	set_state(State.PLAYING)
 	EventBus.game_unpaused.emit()
 
 
-## Toggle between paused and playing
 func toggle_pause() -> void:
 	if is_paused:
 		unpause_game()
 	else:
 		pause_game()
+
+
+func set_checkpoint(checkpoint_id: String, position: Vector2, room_path: String = "") -> void:
+	last_checkpoint_id = checkpoint_id
+	last_checkpoint_position = position
+	last_checkpoint_room = room_path
+	print("[GameManager] Checkpoint set: ", checkpoint_id, " @ ", position)
+
+
+## Call this from the health system when HP reaches zero.
+func kill_player(player: Node2D) -> void:
+	if current_state == State.DEAD:
+		return
+	set_state(State.DEAD)
+	EventBus.player_died.emit()
+	await get_tree().create_timer(0.6).timeout
+	await respawn_player(player)
+
+
+func respawn_player(player: Node2D) -> void:
+	if last_checkpoint_id.is_empty():
+		push_warning("[GameManager] No checkpoint set; preserving current position")
+	else:
+		await _load_checkpoint_room_if_needed()
+		player.global_position = last_checkpoint_position
+
+	if player.has_method("reset_after_death"):
+		player.reset_after_death()
+
+	set_state(State.PLAYING)
+	EventBus.player_respawned.emit()
+
+
+func _load_checkpoint_room_if_needed() -> void:
+	if last_checkpoint_room.is_empty():
+		return
+
+	var game := get_tree().get_first_node_in_group(&"game")
+	if game == null or not game.has_method("load_room"):
+		push_warning("[GameManager] Cannot restore checkpoint room; no Game controller found")
+		return
+
+	var current_map: Node = game.map
+	if current_map and current_map.scene_file_path == last_checkpoint_room:
+		return
+
+	set_state(State.LOADING)
+	EventBus.room_transition_started.emit(last_checkpoint_room)
+	await game.load_room(last_checkpoint_room)

@@ -221,6 +221,7 @@ var _debug_hitbox_active: bool = false
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 
 func _ready() -> void:
+	add_to_group(&"player")
 	# ── Collision layer and mask ──────────────────────────────────────────────
 	collision_layer = 0
 	set_collision_layer_value(2,  true)   # Layer 2: Player
@@ -237,6 +238,10 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not GameManager.is_playing():
+		velocity = Vector2.ZERO
+		return
+
 	_update_timers(delta)
 	_read_jump_input()
 	_detect_wall_slide()
@@ -337,6 +342,30 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 ## Read-only check — use this instead of reading _is_invincible directly
 func is_invincible() -> bool:
 	return _is_invincible
+
+
+## Clears transient movement and combat state after GameManager respawns us.
+func reset_after_death() -> void:
+	velocity = Vector2.ZERO
+	_is_jumping = false
+	_is_dashing = false
+	_is_wall_sliding = false
+	_is_attacking = false
+	_debug_hitbox_active = false
+	_coyote_timer = 0.0
+	_jump_buffer_timer = 0.0
+	_dash_timer = 0.0
+	_wall_jump_lock_timer = 0.0
+	_knockback_timer = 0.0
+	_iframes_timer = 0.0
+	_is_invincible = false
+	_can_air_dash = true
+	_can_double_jump = true
+	set_collision_mask_value(DROP_THROUGH_LAYER, true)
+
+	var animation_player := get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if animation_player:
+		animation_player.stop()
 
 
 # ─── JUMP INPUT ───────────────────────────────────────────────────────────────
