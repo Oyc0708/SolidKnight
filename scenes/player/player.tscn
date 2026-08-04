@@ -8,12 +8,13 @@
 size = Vector2(48, 57)
 
 [sub_resource type="Gradient" id="Gradient_gmlin"]
+offsets = PackedFloat32Array(0.10817308, 0.48317307, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.16870415, 0.16870415, 0.16870415, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_c0m0a"]
 gradient = SubResource("Gradient_gmlin")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.5, 0)
 
 [node name="Player" type="CharacterBody2D" unique_id=422246210]
 collision_layer = 2
@@ -33,11 +34,7 @@ sprite_frames = ExtResource("2_dovo2")
 animation = &"double_jump"
 script = ExtResource("3_gmlin")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1106240203]
-limit_left = -800
-
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=197582199]
 
 [node name="PointLight2D" type="PointLight2D" parent="." unique_id=178278157]
-visible = false
 texture = SubResource("GradientTexture2D_c0m0a")
