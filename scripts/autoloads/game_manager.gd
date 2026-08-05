@@ -25,9 +25,6 @@ var last_checkpoint_id := ""
 var last_checkpoint_position := Vector2.ZERO
 var last_checkpoint_room := ""
 
-## Retained for scripts/UI that need to know the active arrival marker.
-var pending_spawn_marker := ""
-
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
@@ -122,3 +119,6 @@ func _load_checkpoint_room_if_needed() -> void:
 	set_state(State.LOADING)
 	EventBus.room_transition_started.emit(last_checkpoint_room)
 	await game.load_room(last_checkpoint_room)
+	
+func has_checkpoint() -> bool:
+	return not last_checkpoint_id.is_empty()

@@ -2,11 +2,10 @@
 extends "res://addons/MetroidvaniaSystem/Template/Scripts/MetSysGame.gd"
 class_name Game
 
-## Which room to load when the game starts (must match a room name in the MetSys map)
+## Which room to load when the game starts
 @export_file("room_link") var starting_room: String
 
 func _ready() -> void:
-	# Make this script easily reachable from anywhere
 	get_script().set_meta(&"singleton", self)
 	add_to_group(&"game")
 
@@ -25,13 +24,16 @@ func _ready() -> void:
 
 	# 4. Load the first room
 	load_room(starting_room)
+	# After loading the starting room, move the player to the checkpoint if one exists
+	if not GameManager.last_checkpoint_id.is_empty():
+		player.global_position = GameManager.last_checkpoint_position
 	
 	#Debug Test
 	print("[Game] Loaded room: ", starting_room)
 	print("[Game] Current room instance: ", MetSys.get_current_room_instance())
+	
 func _on_room_loaded() -> void:
 	EventBus.room_transition_finished.emit()
-
 
 ## Loads a MetSys room without destroying the persistent player, HUD, or menus.
 func transition_to_room(room_path: String, spawn_marker_name: String = "") -> void:
@@ -52,9 +54,4 @@ func transition_to_room(room_path: String, spawn_marker_name: String = "") -> vo
 		else:
 			push_warning("[Game] Spawn marker not found: " + spawn_marker_name)
 
-	GameManager.pending_spawn_marker = ""
 	GameManager.set_state(GameManager.State.PLAYING)
-
-# Helper so other scripts can find this instance
-static func get_singleton() -> Game:
-	return (Game as Script).get_meta(&"singleton") as Game

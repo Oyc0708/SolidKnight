@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_i2g2l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u82t8"]
-size = Vector2(3381, 1526)
+size = Vector2(1923, 991)
 
 [node name="BossRoom" type="Node2D" unique_id=1292466249]
 
@@ -46,6 +46,6 @@ collision_mask = 2
 script = ExtResource("3_i2g2l")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone" unique_id=1805086182]
-position = Vector2(995.5, 590)
+position = Vector2(959.5, 492.5)
 shape = SubResource("RectangleShape2D_u82t8")
 disabled = true

@@ -7,4 +7,4 @@
 script = ExtResource("1_ui0vk")
 theme = ExtResource("2_3kt0x")
 in_game_cell_size = Vector2(640, 480)
-_last_scene_folder = "res://scenes/levels"
+_last_scene_folder = "res://scenes/levels/zone_b"
