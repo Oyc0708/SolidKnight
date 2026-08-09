@@ -18,16 +18,13 @@ position = Vector2(720.09485, 495.3853)
 [node name="Enemies" type="Node2D" parent="." unique_id=1847326698]
 position = Vector2(1104, 474)
 
-[node name="ExampleEnemy" parent="Enemies" unique_id=1484103932 node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("2_i2g2l")]
-position = Vector2(389, 420)
-patrol_point_a = NodePath("../PatrolA")
-patrol_point_b = NodePath("../PatrolB")
+[node name="PatrolA" type="Node2D" parent="Enemies" unique_id=1819381965]
+position = Vector2(696, 399)
 
-[node name="PatrolA" type="Marker2D" parent="Enemies" unique_id=1639746131]
-position = Vector2(289, 415)
+[node name="PatrolB" type="Node2D" parent="Enemies" unique_id=2008125679]
+position = Vector2(254.7439, 401.19006)
 
-[node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1111150664]
-position = Vector2(564, 414)
+[node name="ExampleEnemy" parent="Enemies" unique_id=396297195 instance=ExtResource("2_i2g2l")]
 
 [node name="Checkpoints" type="Node2D" parent="." unique_id=509300861]
 position = Vector2(631, 632)

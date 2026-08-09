@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://baiiqrs5m3q8r"]
+
+[ext_resource type="Script" uid="uid://3pdkkxcd615w" path="res://scripts/enemies/example_enemy.gd" id="1_script"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hitbox"]
+radius = 8.0
+height = 24.0
+
+[node name="ExampleEnemy" type="CharacterBody2D" unique_id=1484103932]
+collision_layer = 4
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2052120328]
+shape = SubResource("CapsuleShape2D_hitbox")
+
+[node name="Placeholder" type="Polygon2D" parent="." unique_id=1922668817]
+color = Color(0.85, 0.2, 0.2, 1)
+polygon = PackedVector2Array(-8, -12, 8, -12, 8, 12, -8, 12)
+
+[node name="Label" type="Label" parent="." unique_id=1687379741]
+offset_left = -30.0
+offset_top = -32.0
+offset_right = 30.0
+offset_bottom = -14.0
+text = "Example Enemy"
+horizontal_alignment = 1
