@@ -46,7 +46,7 @@ func _die() -> void:
 	queue_free()
 
 
-# Override these in subclasses — base does nothing by default.
+# Override in subclasses
 func _on_patrol(_delta: float) -> void: pass
 func _on_chase(_delta: float) -> void: pass
 func _on_attack(_delta: float) -> void: pass
