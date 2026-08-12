@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6lcxlfpbavfs"
-path="res://.godot/imported/Bringer-of-Death_Attack_3.png-cb0b8b6c26599e605e773044247a0dfd.ctex"
+uid="uid://bxx34whqpbmpn"
+path="res://.godot/imported/Bringer-of-Death-SpritSheet_no-Effect.png-f56418382be5f86566214b923b8d6404.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/boss_enemy/Attack/Bringer-of-Death_Attack_3.png"
-dest_files=["res://.godot/imported/Bringer-of-Death_Attack_3.png-cb0b8b6c26599e605e773044247a0dfd.ctex"]
+source_file="res://assets/sprites/boss_enemy/Bringer-of-Death-SpritSheet_no-Effect.png"
+dest_files=["res://.godot/imported/Bringer-of-Death-SpritSheet_no-Effect.png-f56418382be5f86566214b923b8d6404.ctex"]
 
 [params]
 

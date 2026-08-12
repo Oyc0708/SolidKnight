@@ -17,16 +17,27 @@ class_name Boss
 @onready var animated_sprite: AnimatedSprite2D = $Visuals/AnimatedSprite2D
 @onready var state_machine: BossStateMachine = $StateMachine
 @onready var detection_area: Area2D = $DetectionArea
+@onready var attack_range_area: Area2D = $AttackRangeArea
 
 var current_health: int
 var phase: int = 1
 var player_ref: Node2D = null
+var player_in_attack_range: bool = false
 
 
 func _ready() -> void:
 	current_health = max_health
 	detection_area.body_entered.connect(_on_detection_entered)
 	detection_area.body_exited.connect(_on_detection_exited)
+	attack_range_area.body_entered.connect(_on_attack_range_entered)
+	attack_range_area.body_exited.connect(_on_attack_range_exited)
+
+	# Keep the AttackRangeArea's actual shape in sync with attack_range so
+	# there's only one number to tune, instead of the export var and the
+	# Area2D's radius silently drifting apart.
+	var shape_node: CollisionShape2D = attack_range_area.get_node("CollisionShape2D")
+	if shape_node.shape is CircleShape2D:
+		(shape_node.shape as CircleShape2D).radius = attack_range
 
 
 func _on_detection_entered(body: Node2D) -> void:
@@ -37,6 +48,16 @@ func _on_detection_entered(body: Node2D) -> void:
 func _on_detection_exited(body: Node2D) -> void:
 	if body == player_ref:
 		player_ref = null
+
+
+func _on_attack_range_entered(body: Node2D) -> void:
+	if body.is_in_group(&"player"):
+		player_in_attack_range = true
+
+
+func _on_attack_range_exited(body: Node2D) -> void:
+	if body.is_in_group(&"player"):
+		player_in_attack_range = false
 
 
 ## Called by whatever deals damage to the boss (player attack hitbox, etc.)

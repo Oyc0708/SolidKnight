@@ -1,6 +1,11 @@
 # track_state.gd
 extends BossState
 
+## Stop walking once this close, even if not yet in attack range — prevents
+## the boss visibly stepping into/through the player on the frame before the
+## attack-range transition catches up.
+@export var stop_distance: float = 40.0
+
 
 func enter() -> void:
 	boss.animated_sprite.play("track")
@@ -11,16 +16,22 @@ func physics_update(_delta: float) -> void:
 		boss.state_machine.transition_to(^"IdleState")
 		return
 
-	var dist := boss.global_position.distance_to(boss.player_ref.global_position)
-	if dist <= boss.attack_range:
+	if boss.player_in_attack_range:
 		if boss.phase == 1:
 			boss.state_machine.transition_to(^"AttackPhase1State")
 		else:
 			boss.state_machine.transition_to(^"AttackPhase2State")
 		return
 
+	var dist := boss.global_position.distance_to(boss.player_ref.global_position)
 	var dir := (boss.player_ref.global_position - boss.global_position).normalized()
-	boss.velocity.x = dir.x * boss.move_speed
+
+	if dist <= stop_distance:
+		boss.velocity.x = 0.0
+	else:
+		boss.velocity.x = dir.x * boss.move_speed
+
 	if dir.x != 0:
 		boss.visuals.scale.x = -1 if dir.x > 0 else 1
+
 	boss.move_and_slide()
