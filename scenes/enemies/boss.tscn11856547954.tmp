@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://crf7sdnah48gp"]
+
+[ext_resource type="Script" uid="uid://rtje0s3qpi6u" path="res://scripts/enemies/boss/boss.gd" id="1_1ex25"]
+[ext_resource type="SpriteFrames" uid="uid://chh06qv07pm5j" path="res://assets/sprites/boss_enemy/boss_frames.tres" id="2_3uc6t"]
+[ext_resource type="Script" uid="uid://ct507uq5y0yev" path="res://scripts/enemies/boss/boss_state_machine.gd" id="3_h1cus"]
+[ext_resource type="Script" uid="uid://e6ayn7khgses" path="res://scripts/enemies/boss/states/idle_state.gd" id="4_lia8m"]
+[ext_resource type="Script" uid="uid://dwn1l7o45pjij" path="res://scripts/enemies/boss/states/track_state.gd" id="5_jc8i4"]
+[ext_resource type="Script" uid="uid://dst575gk2bc58" path="res://scripts/enemies/boss/states/attack_phase1_state.gd" id="6_cbm28"]
+[ext_resource type="Script" uid="uid://c0pmll4ucp71c" path="res://scripts/enemies/boss/states/attack_phase2_state.gd" id="7_3e6u2"]
+[ext_resource type="Script" uid="uid://w3f46n58l4nb" path="res://scripts/enemies/boss/states/phase_transition_state.gd" id="8_xueda"]
+[ext_resource type="Script" uid="uid://buh7duc7tjgkc" path="res://scripts/enemies/boss/states/death_state.gd" id="9_kev3k"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 24.0
+height = 72.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
+radius = 200.0
+
+[node name="Boss" type="CharacterBody2D" unique_id=695709896]
+collision_layer = 4
+script = ExtResource("1_1ex25")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1512102660]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1299212922]
+position = Vector2(-37, -19)
+sprite_frames = ExtResource("2_3uc6t")
+animation = &"walk"
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1651162851]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1679457937]
+shape = SubResource("CircleShape2D_detect")
+
+[node name="StateMachine" type="Node" parent="." unique_id=259782008]
+script = ExtResource("3_h1cus")
+initial_state = NodePath("IdleState")
+
+[node name="IdleState" type="Node" parent="StateMachine" unique_id=735469370]
+script = ExtResource("4_lia8m")
+
+[node name="TrackState" type="Node" parent="StateMachine" unique_id=1490404406]
+script = ExtResource("5_jc8i4")
+
+[node name="AttackPhase1State" type="Node" parent="StateMachine" unique_id=473961585]
+script = ExtResource("6_cbm28")
+
+[node name="AttackPhase2State" type="Node" parent="StateMachine" unique_id=976939341]
+script = ExtResource("7_3e6u2")
+
+[node name="PhaseTransitionState" type="Node" parent="StateMachine" unique_id=796114679]
+script = ExtResource("8_xueda")
+
+[node name="DeathState" type="Node" parent="StateMachine" unique_id=2029511943]
+script = ExtResource("9_kev3k")

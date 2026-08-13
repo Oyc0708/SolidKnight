@@ -33,3 +33,7 @@ func _on_settings_button_pressed() -> void:
 func _on_main_menu_button_pressed() -> void:
 	GameManager.unpause_game()   # unpause before changing scene
 	get_tree().change_scene_to_file("res://scenes/menus/main_menu.tscn")
+
+
+func _on_pause_button_pressed() -> void:
+		GameManager.toggle_pause()
