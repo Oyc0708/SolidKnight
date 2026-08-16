@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://ba8p4w38l5j83" path="res://scripts/managers/test_slope.gd" id="6_6xh4u"]
 [ext_resource type="Script" uid="uid://c28sj31wgv3w8" path="res://scripts/objects/checkpoint.gd" id="8_7x1jh"]
 [ext_resource type="Script" uid="uid://b4787who0v5db" path="res://scenes/levels/test_death.gd" id="9_hfwtw"]
+[ext_resource type="PackedScene" uid="uid://baiiqrs5m3q8r" path="res://scenes/enemies/example_enemy.tscn" id="10_2mu0v"]
 [ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="10_room"]
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="11_tiles"]
 
@@ -174,3 +175,17 @@ offset_right = 44.0
 offset_bottom = -8.0
 text = "DeathTest"
 metadata/_edit_use_anchors_ = true
+
+[node name="Enemies" type="Node2D" parent="." unique_id=948952175]
+position = Vector2(79, 379)
+
+[node name="ExampleEnemy" parent="Enemies" unique_id=1484103932 node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("10_2mu0v")]
+position = Vector2(316, 24)
+patrol_point_a = NodePath("../PatrolA")
+patrol_point_b = NodePath("../PatrolB")
+
+[node name="PatrolA" type="Marker2D" parent="Enemies" unique_id=1117089318]
+position = Vector2(216, 19)
+
+[node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1210987215]
+position = Vector2(491, 18)

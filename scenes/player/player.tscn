@@ -31,7 +31,7 @@ shape = SubResource("RectangleShape2D_jgqa8")
 position = Vector2(0, -24)
 scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_dovo2")
-animation = &"double_jump"
+animation = &"attack_01"
 script = ExtResource("3_gmlin")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=197582199]

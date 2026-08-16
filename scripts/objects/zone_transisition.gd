@@ -24,5 +24,4 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 
 	_triggered = true
-	GameManager.pending_spawn_marker = target_spawn_name
 	await game.transition_to_room(target_scene, target_spawn_name)

@@ -1,1 +1,0 @@
-# scripts/objects/checkpoint.gd

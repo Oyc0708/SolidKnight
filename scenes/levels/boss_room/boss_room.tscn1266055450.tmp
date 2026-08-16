@@ -1,10 +1,9 @@
 [gd_scene format=4 uid="uid://cbewfh1wihxk0"]
 
 [ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="1_dxuby"]
-[ext_resource type="PackedScene" uid="uid://dxyvjf46yg2hw" path="res://scenes/enemies/example_enemy.tscn" id="2_i2g2l"]
+[ext_resource type="PackedScene" uid="uid://baiiqrs5m3q8r" path="res://scenes/enemies/example_enemy.tscn" id="2_i2g2l"]
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="3_ahe6h"]
 [ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_i2g2l"]
-[ext_resource type="PackedScene" uid="uid://b4kg5hyvdfovb" path="res://scenes/enemies/boss.tscn" id="3_u82t8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u82t8"]
 size = Vector2(1923, 991)
@@ -12,7 +11,6 @@ size = Vector2(1923, 991)
 [node name="BossRoom" type="Node2D" unique_id=1292466249]
 
 [node name="RoomInstance" parent="." unique_id=1300821533 instance=ExtResource("1_dxuby")]
-music_name = "room"
 
 [node name="Hazards" type="Node2D" parent="." unique_id=1672520259]
 position = Vector2(720.09485, 495.3853)
@@ -20,19 +18,13 @@ position = Vector2(720.09485, 495.3853)
 [node name="Enemies" type="Node2D" parent="." unique_id=1847326698]
 position = Vector2(1104, 474)
 
-[node name="ExampleEnemy" parent="Enemies" unique_id=1484103932 node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("2_i2g2l")]
-position = Vector2(389, 420)
-patrol_point_a = NodePath("../PatrolA")
-patrol_point_b = NodePath("../PatrolB")
+[node name="PatrolA" type="Node2D" parent="Enemies" unique_id=1819381965]
+position = Vector2(696, 399)
 
-[node name="PatrolA" type="Marker2D" parent="Enemies" unique_id=1639746131]
-position = Vector2(289, 415)
+[node name="PatrolB" type="Node2D" parent="Enemies" unique_id=2008125679]
+position = Vector2(254.7439, 401.19006)
 
-[node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1111150664]
-position = Vector2(564, 414)
-
-[node name="Boss" parent="Enemies" unique_id=695709896 instance=ExtResource("3_u82t8")]
-position = Vector2(240, 352)
+[node name="ExampleEnemy" parent="Enemies" unique_id=396297195 instance=ExtResource("2_i2g2l")]
 
 [node name="Checkpoints" type="Node2D" parent="." unique_id=509300861]
 position = Vector2(631, 632)
