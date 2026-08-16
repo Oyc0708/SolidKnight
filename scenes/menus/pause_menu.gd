@@ -10,10 +10,12 @@ func _ready() -> void:
 
 func _show_panel() -> void:
 	pause_panel.visible = true
+	EventBus.play_sfx_requested.emit("pause_open")
 	# Optional: Grab focus on the resume button for controller support here
 
 func _hide_panel() -> void:
 	pause_panel.visible = false
+	EventBus.play_sfx_requested.emit("pause_close")
 
 ## Resume button pressed
 func _on_resume_button_pressed() -> void:
@@ -26,6 +28,7 @@ func _on_restart_button_pressed() -> void:
 
 ## Settings button pressed
 func _on_settings_button_pressed() -> void:
+	EventBus.play_sfx_requested.emit("button_click")
 	# Open settings panel (you can instance a settings scene or emit a signal)
 	EventBus.open_settings_requested.emit()
 
