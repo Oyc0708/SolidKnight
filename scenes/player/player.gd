@@ -218,6 +218,10 @@ var _attack_direction: String = "neutral"
 # Replaced by real Area2D.monitoring in Phase 4.
 var _debug_hitbox_active: bool = false
 
+# ─── CONTINUOUS SFX STATE ─────────────────────────────────────────────────────
+var _footstep_timer: float = 0.0
+var _wall_slide_sfx_timer: float = 0.0
+
 # ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
 
 func _ready() -> void:
@@ -250,6 +254,7 @@ func _physics_process(delta: float) -> void:
 	_handle_attack_input()         # ← M2.3
 	_apply_gravity(delta)
 	_handle_horizontal_movement()
+	_handle_continuous_sfx(delta)
 	move_and_slide()
 	_update_floor_state()
 
@@ -411,7 +416,7 @@ func _execute_jump() -> void:
 	_is_jumping        = true
 	_jump_buffer_timer = 0.0
 	_coyote_timer      = 0.0
-
+	EventBus.play_sfx_requested.emit("jump")
 
 func _execute_double_jump() -> void:
 	# Direct assignment cancels existing vertical velocity regardless of direction
@@ -420,7 +425,7 @@ func _execute_double_jump() -> void:
 	_is_jumping              = true
 	_jump_buffer_timer       = 0.0
 	_double_jump_flash_timer = DOUBLE_JUMP_ANIM_DURATION
-
+	EventBus.play_sfx_requested.emit("jump")
 func _start_drop_through() -> void:
 	# Temporarily remove OneWayPlatform from collision mask
 	set_collision_mask_value(DROP_THROUGH_LAYER, false)
@@ -466,6 +471,7 @@ func _execute_wall_jump() -> void:
 	_jump_buffer_timer    = 0.0
 	_is_wall_sliding      = false
 	_can_air_dash         = true
+	EventBus.play_sfx_requested.emit("jump")
 	# _can_double_jump is intentionally NOT restored by wall jumps
 
 
@@ -496,6 +502,8 @@ func _start_dash() -> void:
 	_dash_cooldown_timer = dash_cooldown
 	_dash_direction      = facing_direction
 
+	EventBus.play_sfx_requested.emit("dash")
+	
 	if not is_on_floor():
 		_can_air_dash = false
 
@@ -534,7 +542,7 @@ func _handle_attack_input() -> void:
 
 	# ── Start the attack ──────────────────────────────────────────────────────
 	_is_attacking = true
-
+	EventBus.play_sfx_requested.emit("player_attack_swing")
 	# Trigger the corresponding AnimationPlayer timing track.
 	# get_node_or_null is used instead of get_node to prevent crashes if the
 	# AnimationPlayer node is renamed or missing during development.
@@ -634,6 +642,8 @@ func _update_floor_state() -> void:
 		_coyote_timer = coyote_time
 
 	if is_on_floor():
+		if not _was_on_floor:
+			EventBus.play_sfx_requested.emit("player_land")
 		_is_jumping      = false
 		_can_air_dash    = true
 		_is_wall_sliding = false
@@ -732,3 +742,24 @@ func _on_land_impact() -> void:
 ## sfx_name must match a filename in assets/audio/sfx/ (without extension).
 func _on_play_sfx(sfx_name: String) -> void:
 	EventBus.play_sfx_requested.emit(sfx_name)
+	
+# ─── CONTINUOUS AUDIO LOGIC ───────────────────────────────────────────────────
+
+func _handle_continuous_sfx(delta: float) -> void:
+	# 1. Footsteps: play every 0.3s when grounded, moving, and not attacking
+	if is_on_floor() and abs(velocity.x) > 10.0 and not _is_attacking:
+		_footstep_timer -= delta
+		if _footstep_timer <= 0.0:
+			_footstep_timer = 0.3 # Playback interval (seconds)
+			EventBus.play_sfx_requested.emit("footstep")
+	else:
+		_footstep_timer = 0.0 # Reset immediately when stopped or airborne
+
+	# 2. Wall slide SFX: play every 0.25s while wall sliding downwards
+	if _is_wall_sliding and velocity.y > 0.0:
+		_wall_slide_sfx_timer -= delta
+		if _wall_slide_sfx_timer <= 0.0:
+			_wall_slide_sfx_timer = 0.25
+			EventBus.play_sfx_requested.emit("wall_slide")
+	else:
+		_wall_slide_sfx_timer = 0.0

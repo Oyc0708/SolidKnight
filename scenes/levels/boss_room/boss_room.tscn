@@ -12,6 +12,7 @@ size = Vector2(1923, 991)
 [node name="BossRoom" type="Node2D" unique_id=1292466249]
 
 [node name="RoomInstance" parent="." unique_id=1300821533 instance=ExtResource("1_dxuby")]
+music_name = "room"
 
 [node name="Hazards" type="Node2D" parent="." unique_id=1672520259]
 position = Vector2(720.09485, 495.3853)

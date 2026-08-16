@@ -15,6 +15,8 @@ var min_cell := Vector2i.MAX
 var max_cell := Vector2i.MIN
 var layer: int
 
+@export var music_name: String = ""
+
 signal previews_updated
 
 func _enter_tree() -> void:
@@ -190,3 +192,6 @@ func _draw() -> void:
 					draw_rect(Rect2(coords * MetSys.settings.in_game_cell_size, Vector2(width, MetSys.settings.in_game_cell_size.y)), color)
 				MetroidvaniaSystem.U:
 					draw_rect(Rect2(coords * MetSys.settings.in_game_cell_size, Vector2(MetSys.settings.in_game_cell_size.x, width)), color)
+func _ready() -> void:
+	if not Engine.is_editor_hint() and not music_name.is_empty():
+		EventBus.play_music_requested.emit(music_name)

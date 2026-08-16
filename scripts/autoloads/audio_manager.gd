@@ -42,6 +42,7 @@ func _ready() -> void:
 	# Using a separate player means music and SFX have independent volume control
 	_sfx_player = AudioStreamPlayer.new()
 	_sfx_player.name = "SFXPlayer"
+	_sfx_player.max_polyphony = 8
 	add_child(_sfx_player)
 	
 	# Connect to EventBus so any script can request audio via signals
@@ -56,6 +57,7 @@ func _ready() -> void:
 ## Play a sound effect by filename (without extension)
 ## Example: play_sfx("player_jump") plays res://assets/audio/sfx/player_jump.wav
 func play_sfx(sfx_name: String) -> void:
+	print("[AudioManager] Received play request: ", sfx_name)
 	var path := SFX_BASE_PATH + sfx_name + ".wav"
 	
 	# Check if file exists before loading — missing audio causes crashes
@@ -64,7 +66,7 @@ func play_sfx(sfx_name: String) -> void:
 		# Use this for "nice to have" checks that shouldn't stop gameplay
 		push_warning("[AudioManager] SFX not found: " + path)
 		return
-	
+	_sfx_player.pitch_scale = randf_range(0.9, 1.1)
 	_sfx_player.stream = load(path)
 	_sfx_player.play()
 

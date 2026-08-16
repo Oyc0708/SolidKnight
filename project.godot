@@ -15,13 +15,17 @@ config/version="0.1.0"
 run/main_scene="uid://c2bbxjni56f0e"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
+[audio]
+
+buses/default_bus_layout="uid://cw86fdoypp8so"
+
 [autoload]
 
 EventBus="*uid://d3bathuja0rsj"
 GameManager="*uid://eci8fatxhaij"
 SaveSystem="*uid://dmsoa5ktpk3b"
-AudioManager="*uid://bs5lb1a2svh1a"
 SceneManager="*uid://cli1ue3ii4afg"
+AudioManager="*uid://bs5lb1a2svh1a"
 MetSys="*uid://c01ibpvrp2wsd"
 
 [display]
