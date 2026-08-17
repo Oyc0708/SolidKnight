@@ -44,7 +44,7 @@ signal player_landed()
 signal hit_landed(target: Node, damage: int, hit_position: Vector2)
 signal enemy_damaged(enemy: Node, amount: int)
 signal enemy_died(enemy: Node, position: Vector2)
-
+signal enemy_attacked(enemy: Node2D)
 
 # ─── GEO (CURRENCY) ──────────────────────────────────────────────────────────
 # Geo is the in-game currency (equivalent to Hollow Knight's geo)
