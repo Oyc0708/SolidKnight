@@ -80,13 +80,15 @@ func _on_chase(_delta: float) -> void:
 	velocity.x = dir.x * move_speed * 1.5
 
 
-#func _on_attack(_delta: float) -> void:
-	#velocity.x = 0.0
-	#if _attack_timer <= 0.0 and player_ref != null:
-		#_attack_timer = attack_cooldown
-		#if player_ref.has_method("take_damage"):
-			#player_ref.take_damage(1)  # placeholder until team locks in take_damage() signature
-		#EventBus.enemy_attacked.emit(self)
+# Fix for Bug #6: Uncommented the attack logic so the enemy deals damage
+func _on_attack(_delta: float) -> void:
+	velocity.x = 0.0
+	if _attack_timer <= 0.0 and player_ref != null:
+		_attack_timer = attack_cooldown
+		if player_ref.has_method("take_damage"):
+			# Pass global_position so the player gets knocked back properly!
+			player_ref.take_damage(1, global_position) 
+		EventBus.enemy_attacked.emit(self)
 
 
 func _on_return(_delta: float) -> void:

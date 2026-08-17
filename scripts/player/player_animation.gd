@@ -24,7 +24,7 @@ const ANIM_WALL_SLIDE: String  = "wall_slide"
 const ANIM_DOUBLE_JUMP: String = "double_jump"
 const ANIM_DASH: String        = "dash"
 const ANIM_HURT: String        = "hurt"
-const ANIM_DEATH: String       = "death"
+const ANIM_DEATH: String       = "dead" # Updated to match SpriteFrames (Fix for Bug #10)
 const ANIM_ATTACK_01: String   = "attack_01"
 const ANIM_ATTACK_UP: String   = "attack_up"
 const ANIM_ATTACK_DOWN: String = "attack_down"
@@ -41,7 +41,6 @@ const IDLE_THRESHOLD: float = 10.0
 ## Maximum slope angle (radians) before sprite tilt is clamped (~30°)
 const MAX_TILT_ANGLE: float = 0.52
 
-## ← NEW M2.4
 ## velocity.y magnitude below which the player is considered "at the apex".
 ## Within this zone we hold jump_fall to prevent rise/fall flickering.
 ## 60.0 px/s = approximately 3.5 frames at 60hz near the very top of the arc.
@@ -49,12 +48,10 @@ const MAX_TILT_ANGLE: float = 0.52
 ## fall animation triggers too early (player still visibly rising).
 const APEX_THRESHOLD: float = 60.0
 
-## ← NEW M2.4
 ## Minimum animation playback multiplier — used when barely moving.
 ## 0.6 = walk animation plays at 60% speed when velocity is very low.
 const MIN_ANIM_SPEED: float = 0.6
 
-## ← NEW M2.4
 ## Maximum animation playback multiplier — used at full sprint.
 ## 1.4 = walk/run animation plays at 140% speed at move_speed.
 ## Keep below 2.0 or individual frames become too brief to read.
@@ -110,7 +107,7 @@ func _process(_delta: float) -> void:
 	var on_floor: bool       = _player.is_on_floor()
 	var just_landed: bool    = on_floor and _was_airborne
 
-	var dj_timer: float         = _player.get_double_jump_flash_timer()
+	var dj_timer: float          = _player.get_double_jump_flash_timer()
 	var just_double_jumped: bool = dj_timer > 0.0 and _prev_dj_timer == 0.0
 
 	_was_airborne  = not on_floor
@@ -143,7 +140,6 @@ func _update_tilt() -> void:
 
 
 func _update_animation_speed() -> void:
-	## ← NEW M2.4
 	## Scale animation playback rate to match actual horizontal movement speed.
 	##
 	## Why: At 60% movement speed (attack penalty), the walk animation plays too

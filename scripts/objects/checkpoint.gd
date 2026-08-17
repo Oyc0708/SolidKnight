@@ -16,12 +16,17 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if _activated or not body.is_in_group(&"player"):
+	# Guard: Only the player can trigger checkpoints
+	if not body.is_in_group(&"player"):
 		return
 
-	_activated = true
+	# Always set the checkpoint when the player touches it, allowing reuse (Fix for Bug #19)
 	GameManager.set_checkpoint(checkpoint_id, global_position, _get_owning_room_path())
-	EventBus.checkpoint_activated.emit(checkpoint_id)
+
+	# Only fire the visual/audio feedback event once
+	if not _activated:
+		_activated = true
+		EventBus.checkpoint_activated.emit(checkpoint_id)
 
 
 func _get_owning_room_path() -> String:
