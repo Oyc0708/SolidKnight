@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://dxyvjf46yg2hw"]
 
 [ext_resource type="Script" uid="uid://3pdkkxcd615w" path="res://scripts/enemies/example_enemy.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://est0ekaxvo76" path="res://scripts/enemies/heart_pickup.tscn" id="2_dklk5"]
+[ext_resource type="PackedScene" uid="uid://csjjnc5kjmeum" path="res://scenes/combat/hurtbox.tscn" id="3_4rqkl"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hitbox"]
 radius = 8.0
@@ -9,6 +11,7 @@ height = 24.0
 [node name="ExampleEnemy" type="CharacterBody2D" unique_id=94661363]
 collision_layer = 4
 script = ExtResource("1_script")
+drop_scene = ExtResource("2_dklk5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=140115573]
 shape = SubResource("CapsuleShape2D_hitbox")
@@ -27,3 +30,7 @@ offset_bottom = -14.0
 text = "Example Enemy"
 horizontal_alignment = 1
 metadata/_edit_use_anchors_ = true
+
+[node name="Hurtbox" parent="." unique_id=2002891219 node_paths=PackedStringArray("owner_node") instance=ExtResource("3_4rqkl")]
+collision_layer = 16
+owner_node = NodePath("..")

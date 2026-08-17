@@ -3,6 +3,9 @@
 # Shared skeleton for all enemy types. Subclasses override the _on_* methods
 # to implement type-specific behavior; the state machine and player-detection
 # plumbing stays here so it isn't duplicated per enemy.
+#
+# MILESTONE M2.6 — Health Pickup Integration
+#   + Added drop_scene and drop_chance for loot spawning on death
 # ─────────────────────────────────────────────────────────────────────────────
 extends CharacterBody2D
 class_name EnemyBase
@@ -12,6 +15,10 @@ enum State { IDLE, PATROL, CHASE, ATTACK, RETURN, DEAD }
 @export var max_health: int = 10
 @export var detection_range: float = 150.0
 @export var attack_range: float = 40.0
+
+# ─── LOOT SETTINGS ───────────────────────────────────────────────────────────
+@export var drop_scene: PackedScene
+@export_range(0.0, 1.0) var drop_chance: float = 0.5 # 50% chance by default
 
 var current_health: int
 var state: State = State.IDLE
@@ -42,6 +49,14 @@ func take_damage(amount: int) -> void:
 
 func _die() -> void:
 	state = State.DEAD
+	
+	# NEW M2.6: Spawn loot before freeing the node
+	if drop_scene != null and randf() <= drop_chance:
+		var drop = drop_scene.instantiate()
+		drop.global_position = global_position
+		# Add to the current scene so it doesn't get deleted when the enemy frees itself
+		get_tree().current_scene.add_child(drop)
+	
 	# Fix for Bug #18: Pass the global_position along with the enemy node
 	EventBus.enemy_died.emit(self, global_position)
 	queue_free()

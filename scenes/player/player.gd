@@ -1,10 +1,9 @@
 # player.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# MILESTONE M2.5 — Ranged Attack Integration
+# MILESTONE M2.6 — Health Pickup Integration
 #
 # Fixes applied:
-#   + Added shoot state, cooldown, and projectile instantiation
-#   + Exported projectile_scene for easy Inspector assignment
+#   + Added heal() function for health restoration
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerController
 extends CharacterBody2D
@@ -320,7 +319,7 @@ func _update_timers(delta: float) -> void:
 			_is_shooting = false
 
 
-# ─── PUBLIC DAMAGE FUNCTION ───────────────────────────────────────────────────
+# ─── PUBLIC DAMAGE & HEAL FUNCTIONS ───────────────────────────────────────────
 
 ## Called by hurtboxes (M4.1) and hazards (M7.6) when the player takes damage.
 ## amount:                 HP to remove — forwarded to EventBus for health system (Phase 5)
@@ -388,6 +387,21 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 	# ── Trigger Death ─────────────────────────────────────────────────────────
 	if current_health <= 0:
 		die()
+
+## ← NEW M2.6: Called by health pickups to restore player HP
+func heal(amount: int) -> void:
+	if current_health >= max_health:
+		return # Already at full health, don't waste the heal
+		
+	current_health += amount
+	if current_health > max_health:
+		current_health = max_health
+		
+	# Instantly update HUD
+	health_changed.emit(current_health, max_health)
+	
+	# Optional: Play a heal sound effect!
+	EventBus.play_sfx_requested.emit("heal")
 
 
 func die() -> void:
