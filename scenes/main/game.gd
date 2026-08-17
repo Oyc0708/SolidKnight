@@ -15,6 +15,10 @@ func _ready() -> void:
 
 	# 2. Register the player so MetSys automatically tracks its position
 	set_player($Player)
+	
+	# Connect health signal to HUD (Fix for Bug #14)
+	if player:
+		player.health_changed.connect(_on_player_health_changed)
 
 	# 3. Add the built‑in room‑transition module
 	add_module("RoomTransitions.gd")
@@ -22,8 +26,9 @@ func _ready() -> void:
 	# Connect before loading because load_room() can complete immediately.
 	room_loaded.connect(_on_room_loaded)
 
-	# 4. Load the first room
-	load_room(starting_room)
+	# 4. Load the first room (Awaited to fix Bug #16)
+	await load_room(starting_room)
+	
 	# After loading the starting room, move the player to the checkpoint if one exists
 	if not GameManager.last_checkpoint_id.is_empty():
 		player.global_position = GameManager.last_checkpoint_position
@@ -34,6 +39,13 @@ func _ready() -> void:
 	
 func _on_room_loaded() -> void:
 	EventBus.room_transition_finished.emit()
+
+# Fix for Bug #14: Update the HUD when health changes
+func _on_player_health_changed(current_hp: int, max_hp: int) -> void:
+	var hud = get_node_or_null("PlayerHud/heart/HeartContainer")
+	if hud and "max_hearts" in hud:
+		var hearts := ceili(current_hp / float(max_hp) * hud.max_hearts)
+		hud.update_heart(hearts)
 
 ## Loads a MetSys room without destroying the persistent player, HUD, or menus.
 func transition_to_room(room_path: String, spawn_marker_name: String = "") -> void:

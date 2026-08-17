@@ -42,7 +42,8 @@ func take_damage(amount: int) -> void:
 
 func _die() -> void:
 	state = State.DEAD
-	EventBus.enemy_died.emit(self)
+	# Fix for Bug #18: Pass the global_position along with the enemy node
+	EventBus.enemy_died.emit(self, global_position)
 	queue_free()
 
 

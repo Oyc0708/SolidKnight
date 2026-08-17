@@ -2,23 +2,10 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MILESTONE M2.3 — AnimationPlayer frame events, attack timing, landing events
 #
-# Fixes applied from M1.6 file:
-#   ~ _is_attacking / _attack_direction moved to correct ATTACK STATE section
-#   ~ _handle_horizontal_movement() duplicate code removed, effective_speed fixed
-#   ~ get_current_floor_angle() renamed to get_floor_angle() (matches animation controller)
-#
-# New additions this milestone:
-#   + attack_move_penalty  @export constant
-#   + _is_attacking, _attack_direction  state variables (moved to correct section)
-#   + _debug_hitbox_active  debug variable
-#   + _handle_attack_input()  reads attack button, sets direction, starts AnimationPlayer
-#   + _on_attack_started/finished/hitbox_active  AnimationPlayer callback stubs
-#   + _on_land_impact(), _on_play_sfx()  event callback stubs
-#   + is_attacking(), get_attack_direction()  public accessors
-#   ~ _start_dash()  cancels active attack before dashing
-#   ~ take_damage()  cancels active attack when hit, updates health, triggers death
-#   ~ _handle_horizontal_movement()  applies attack_move_penalty cleanly (fixed)
-#   ~ _draw()  adds debug hitbox rectangle during active hitbox window
+# Fixes applied:
+#   + Fixed _attack_timer scoping and initialization to prevent soft-locks
+#   + Removed duplicate "player_attack_swing" and "player_land" SFX calls
+#   + Wired die() to GameManager.kill_player()
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerController
 extends CharacterBody2D
@@ -116,7 +103,7 @@ var current_health: int
 @export var iframes_duration: float = 1.2
 
 
-# ─── EXPORTED ATTACK CONSTANTS ← NEW M2.3 ────────────────────────────────────
+# ─── EXPORTED ATTACK CONSTANTS ───────────────────────────────────────────────
 
 ## Horizontal speed multiplier while attacking on the ground.
 ## 0.6 = 60% of normal speed — creates commitment, cannot freely reposition mid-swing.
@@ -208,12 +195,7 @@ var _knockback_direction: float = 1.0
 var _current_floor_angle: float = 0.0
 
 
-# ─── ATTACK STATE ← NEW M2.3 ─────────────────────────────────────────────────
-# NOTE: These variables are declared here, in the state section, so they exist
-# before any function that references them. Declaring them after _handle_attack_input()
-# (as in the previous version) causes confusing ordering — always declare variables
-# at the top of their logical section, before any functions.
-
+# ─── ATTACK STATE ────────────────────────────────────────────────────────────
 # True from _on_attack_started() call until _on_attack_finished() call.
 # AnimationPlayer method tracks drive both transitions.
 var _is_attacking: bool = false
@@ -228,6 +210,10 @@ var _attack_direction: String = "neutral"
 # hitbox_off keyframes). Drives the debug orange rectangle in _draw().
 # Replaced by real Area2D.monitoring in Phase 4.
 var _debug_hitbox_active: bool = false
+
+# Fallback timer in case the AnimationPlayer lacks the proper method tracks
+var _attack_timer: float = 0.0
+const ATTACK_DURATION: float = 0.55
 
 # ─── CONTINUOUS SFX STATE ─────────────────────────────────────────────────────
 var _footstep_timer: float = 0.0
@@ -252,7 +238,7 @@ func _ready() -> void:
 	# ── Health Initialization ────────────────────────────────────────────────
 	current_health = max_health
 	# Defer emission slightly to ensure the HUD is fully ready to receive it
-	health_changed.call_deferred("emit", current_health, max_health)
+	health_changed.emit.call_deferred(current_health, max_health)
 
 	print("[Player] Ready — position: ", global_position)
 
@@ -267,7 +253,7 @@ func _physics_process(delta: float) -> void:
 	_detect_wall_slide()
 	_handle_jump()
 	_handle_dash_input()
-	_handle_attack_input()         # ← M2.3
+	_handle_attack_input()
 	_apply_gravity(delta)
 	_handle_horizontal_movement()
 	_handle_continuous_sfx(delta)
@@ -302,6 +288,12 @@ func _update_timers(delta: float) -> void:
 		if _drop_through_timer <= 0.0:
 			_drop_through_timer = 0.0
 			set_collision_mask_value(DROP_THROUGH_LAYER, true)
+			
+	# Attack timeout fallback
+	if _is_attacking:
+		_attack_timer -= delta
+		if _attack_timer <= 0.0:
+			_on_attack_finished()
 
 
 # ─── PUBLIC DAMAGE FUNCTION ───────────────────────────────────────────────────
@@ -322,7 +314,7 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 		
 	health_changed.emit(current_health, max_health)
 
-	# ── Cancel active attack ← NEW M2.3 ──────────────────────────────────────
+	# ── Cancel active attack ─────────────────────────────────────────────────
 	# Taking a hit interrupts any ongoing attack sequence.
 	# The AnimationPlayer attack track is stopped so its callbacks don't fire
 	# out of sequence (e.g. hitbox_off after the animation was interrupted).
@@ -373,7 +365,7 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 
 func die() -> void:
 	print("[Player] Player has died!")
-	# We will add death animation or GameManager respawn logic here later
+	GameManager.kill_player(self)
 
 
 ## Read-only check — use this instead of reading _is_invincible directly
@@ -524,7 +516,7 @@ func _handle_dash_input() -> void:
 
 
 func _start_dash() -> void:
-	# ── Cancel active attack ← NEW M2.3 ──────────────────────────────────────
+	# ── Cancel active attack ──────────────────────────────────────────────────
 	# Dashing out of an attack is intentional — it is the player's escape option.
 	# Stop the AnimationPlayer so hitbox callbacks don't fire after the attack ends.
 	if _is_attacking:
@@ -557,7 +549,7 @@ func _end_dash() -> void:
 	# _is_invincible is NOT cleared here — computed from _is_dashing at end of frame
 
 
-# ─── ATTACK ← NEW M2.3 ───────────────────────────────────────────────────────
+# ─── ATTACK ──────────────────────────────────────────────────────────────────
 
 func _handle_attack_input() -> void:
 	# Gate 1: Cannot start a new attack while one is already active
@@ -580,10 +572,9 @@ func _handle_attack_input() -> void:
 
 	# ── Start the attack ──────────────────────────────────────────────────────
 	_is_attacking = true
-	EventBus.play_sfx_requested.emit("player_attack_swing")
+	_attack_timer = ATTACK_DURATION # Fallback safety timer
+	
 	# Trigger the corresponding AnimationPlayer timing track.
-	# get_node_or_null is used instead of get_node to prevent crashes if the
-	# AnimationPlayer node is renamed or missing during development.
 	var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
 	if ap:
 		match _attack_direction:
@@ -596,8 +587,6 @@ func _handle_attack_input() -> void:
 
 func _apply_gravity(delta: float) -> void:
 	# Case 1: On the floor — reset residual Y velocity
-	# "and not _is_jumping" prevents gravity from zeroing velocity.y on the
-	# exact frame a jump fires (when the player is still touching the floor)
 	if is_on_floor() and not _is_jumping:
 		velocity.y = 0.0
 		return
@@ -652,10 +641,6 @@ func _handle_horizontal_movement() -> void:
 		return
 
 	# ── Normal movement with optional attack penalty ───────────────────────────
-	# NOTE: This is the FIX from the previous version.
-	# The old code set velocity.x = direction * move_speed FIRST, then set it
-	# again with effective_speed below, creating a duplicate assignment.
-	# Now there is exactly ONE assignment to velocity.x in this branch.
 	var direction: float = Input.get_axis("move_left", "move_right")
 
 	# Attack penalty: slow the player while swinging on the ground.
@@ -680,8 +665,6 @@ func _update_floor_state() -> void:
 		_coyote_timer = coyote_time
 
 	if is_on_floor():
-		if not _was_on_floor:
-			EventBus.play_sfx_requested.emit("player_land")
 		_is_jumping      = false
 		_can_air_dash    = true
 		_is_wall_sliding = false
@@ -719,7 +702,6 @@ func get_double_jump_flash_timer() -> float:
 	return _double_jump_flash_timer
 
 ## Floor tilt in radians. 0.0 = flat. Used by sprite rotation in animation controller.
-## Renamed from get_current_floor_angle() to match player_animation.gd expectation.
 func get_current_floor_angle() -> float:
 	return _current_floor_angle
 
@@ -732,28 +714,17 @@ func get_attack_direction() -> String:
 	return _attack_direction
 
 
-# ─── ANIMATION EVENT CALLBACKS ← NEW M2.3 ────────────────────────────────────
+# ─── ANIMATION EVENT CALLBACKS ───────────────────────────────────────────────
 # Called by AnimationPlayer method tracks at precise timestamps.
-# Stubs now — Phase 4 connects real hitbox Area2D, Phase 11 adds audio,
-# Phase 12 adds particle spawning.
 
 ## Called at t=0.00 of every attack animation — fires the swing sound request
 func _on_attack_started() -> void:
-	EventBus.play_sfx_requested.emit("player_attack_swing")
 	print("[Player] Attack started — direction: ", _attack_direction)
 
 
 ## Called at t=0.15 (ON) and t=0.25 (OFF) of attack_01 by AnimationPlayer.
 ## active=true: hitbox window opens.  active=false: hitbox window closes.
-## Phase 4 replaces the debug flag with real Area2D.monitoring control.
 func _on_attack_hitbox_active(active: bool) -> void:
-	# _debug_hitbox_active is kept as a flag — Phase 4 replaces this entire
-	# function body with real Area2D.monitoring control:
-	#
-	#   var hitbox := get_node_or_null("AttackHitbox") as Area2D
-	#   if hitbox:
-	#       hitbox.monitoring  = active
-	#       hitbox.monitorable = active
 	_debug_hitbox_active = active
 	print("[Player] Hitbox active: ", active)
 
@@ -771,7 +742,6 @@ func _on_attack_finished() -> void:
 ## Fires the landing sound request and will trigger dust particles in Phase 12.
 func _on_land_impact() -> void:
 	EventBus.play_sfx_requested.emit("player_land")
-	# Phase 12: EventBus.spawn_particles_requested.emit("dust_land", global_position)
 	print("[Player] Land impact")
 
 
