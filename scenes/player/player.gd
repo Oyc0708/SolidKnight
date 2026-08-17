@@ -1,11 +1,10 @@
 # player.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# MILESTONE M2.3 — AnimationPlayer frame events, attack timing, landing events
+# MILESTONE M2.5 — Ranged Attack Integration
 #
 # Fixes applied:
-#   + Fixed _attack_timer scoping and initialization to prevent soft-locks
-#   + Removed duplicate "player_attack_swing" and "player_land" SFX calls
-#   + Wired die() to GameManager.kill_player()
+#   + Added shoot state, cooldown, and projectile instantiation
+#   + Exported projectile_scene for easy Inspector assignment
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerController
 extends CharacterBody2D
@@ -109,6 +108,15 @@ var current_health: int
 ## 0.6 = 60% of normal speed — creates commitment, cannot freely reposition mid-swing.
 ## 1.0 = no penalty.  Air attacks are always full speed (penalty only applies on floor).
 @export var attack_move_penalty: float = 0.6
+
+# ─── EXPORTED RANGED CONSTANTS ───────────────────────────────────────────────
+
+## The bullet scene to spawn when shooting
+@export var projectile_scene: PackedScene
+
+## Minimum time between shots (seconds)
+@export var shoot_cooldown: float = 0.4
+
 
 # ─── PHYSICS LAYER CONSTANTS ─────────────────────────────────────────────────
 
@@ -215,6 +223,14 @@ var _debug_hitbox_active: bool = false
 var _attack_timer: float = 0.0
 const ATTACK_DURATION: float = 0.55
 
+
+# ─── SHOOT STATE ─────────────────────────────────────────────────────────────
+var _is_shooting: bool = false
+var _shoot_cooldown_timer: float = 0.0
+var _shoot_state_timer: float = 0.0
+const SHOOT_DURATION: float = 0.25 # How long the player is locked in the "shoot" pose
+
+
 # ─── CONTINUOUS SFX STATE ─────────────────────────────────────────────────────
 var _footstep_timer: float = 0.0
 var _wall_slide_sfx_timer: float = 0.0
@@ -254,6 +270,7 @@ func _physics_process(delta: float) -> void:
 	_handle_jump()
 	_handle_dash_input()
 	_handle_attack_input()
+	_handle_shoot_input()
 	_apply_gravity(delta)
 	_handle_horizontal_movement()
 	_handle_continuous_sfx(delta)
@@ -275,6 +292,7 @@ func _update_timers(delta: float) -> void:
 	_double_jump_flash_timer = max(0.0, _double_jump_flash_timer - delta)
 	_iframes_timer           = max(0.0, _iframes_timer           - delta)
 	_knockback_timer         = max(0.0, _knockback_timer         - delta)
+	_shoot_cooldown_timer    = max(0.0, _shoot_cooldown_timer    - delta)
 
 	# Active dash duration tick
 	if _is_dashing:
@@ -295,13 +313,19 @@ func _update_timers(delta: float) -> void:
 		if _attack_timer <= 0.0:
 			_on_attack_finished()
 
+	# Shoot state timeout
+	if _is_shooting:
+		_shoot_state_timer -= delta
+		if _shoot_state_timer <= 0.0:
+			_is_shooting = false
+
 
 # ─── PUBLIC DAMAGE FUNCTION ───────────────────────────────────────────────────
 
 ## Called by hurtboxes (M4.1) and hazards (M7.6) when the player takes damage.
 ## amount:                 HP to remove — forwarded to EventBus for health system (Phase 5)
 ## source_position:  world position of damage source — used to compute knockback direction.
-##                   Pass Vector2.ZERO for hazards with no directional source.
+##                 Pass Vector2.ZERO for hazards with no directional source.
 func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 	# Guard: already invincible — damage is ignored
 	if _is_invincible:
@@ -325,6 +349,9 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:
 			ap.stop()
+
+	if _is_shooting:
+		_is_shooting = false
 
 	# ── Compute knockback direction ───────────────────────────────────────────
 	var knockback_dir: Vector2
@@ -385,6 +412,7 @@ func reset_after_death() -> void:
 	_is_dashing = false
 	_is_wall_sliding = false
 	_is_attacking = false
+	_is_shooting = false
 	_debug_hitbox_active = false
 	_coyote_timer = 0.0
 	_jump_buffer_timer = 0.0
@@ -392,6 +420,7 @@ func reset_after_death() -> void:
 	_wall_jump_lock_timer = 0.0
 	_knockback_timer = 0.0
 	_iframes_timer = 0.0
+	_shoot_cooldown_timer = 0.0
 	_is_invincible = false
 	_can_air_dash = true
 	_can_double_jump = true
@@ -526,6 +555,9 @@ func _start_dash() -> void:
 		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:
 			ap.stop()
+			
+	if _is_shooting:
+		_is_shooting = false
 
 	_is_dashing          = true
 	_dash_timer          = dash_duration
@@ -553,7 +585,7 @@ func _end_dash() -> void:
 
 func _handle_attack_input() -> void:
 	# Gate 1: Cannot start a new attack while one is already active
-	if _is_attacking:
+	if _is_attacking or _is_shooting:
 		return
 
 	# Gate 2: Attack button must have been JUST pressed this frame
@@ -581,6 +613,45 @@ func _handle_attack_input() -> void:
 			"up":   ap.play("attack_up")
 			"down": ap.play("attack_down")
 			_:      ap.play("attack_01")
+
+
+# ─── RANGED ATTACK ───────────────────────────────────────────────────────────
+
+func _handle_shoot_input() -> void:
+	if _is_attacking or _is_shooting or _is_dashing:
+		return
+	if not Input.is_action_just_pressed("shoot"):
+		return
+	if _shoot_cooldown_timer > 0.0:
+		return
+
+	_is_shooting = true
+	_shoot_state_timer = SHOOT_DURATION
+	_shoot_cooldown_timer = shoot_cooldown
+
+	var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap and ap.has_animation("shoot"):
+		ap.play("shoot")
+
+	_spawn_projectile()
+
+func _spawn_projectile() -> void:
+	if projectile_scene == null:
+		push_warning("[Player] No projectile_scene assigned! Drag a scene into the inspector.")
+		return
+		
+	var proj = projectile_scene.instantiate()
+	
+	# Position the bullet slightly in front of the player (offset by 20 pixels) and centered vertically
+	proj.global_position = global_position + Vector2(facing_direction * 20.0, -10.0)
+	
+	# Pass the direction to the bullet script so it knows which way to fly
+	if proj.has_method("set_direction"):
+		proj.set_direction(facing_direction)
+		
+	# Add it to the main scene tree so it doesn't move with the player when they walk
+	get_tree().current_scene.add_child(proj)
+	EventBus.play_sfx_requested.emit("shoot")
 
 
 # ─── GRAVITY ──────────────────────────────────────────────────────────────────
@@ -708,6 +779,10 @@ func get_current_floor_angle() -> float:
 ## True from attack start until _on_attack_finished() fires
 func is_attacking() -> bool:
 	return _is_attacking
+
+## True for a brief window after firing a projectile
+func is_shooting() -> bool:
+	return _is_shooting
 
 ## Current attack direction: "neutral", "up", or "down"
 func get_attack_direction() -> String:
