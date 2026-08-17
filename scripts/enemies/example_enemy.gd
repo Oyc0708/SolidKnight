@@ -88,8 +88,7 @@ func _on_attack(_delta: float) -> void:
 		if player_ref.has_method("take_damage"):
 			# Pass global_position so the player gets knocked back properly!
 			player_ref.take_damage(1, global_position) 
-		EventBus.enemy_attacked.emit(self)
-
+			EventBus.enemy_attacked.emit(self)
 
 func _on_return(_delta: float) -> void:
 	var dir := (_origin_position - global_position).normalized()

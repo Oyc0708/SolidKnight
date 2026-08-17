@@ -35,15 +35,17 @@ var _current_music: String = ""
 func _ready() -> void:
 	# Create an AudioStreamPlayer for background music
 	_music_player = AudioStreamPlayer.new()
-	_music_player.name = "MusicPlayer"
 	add_child(_music_player)          # Must add to scene tree to function
+	_music_player.name = "MusicPlayer"
+	_music_player.bus = "Music"
 	
 	# Create a separate AudioStreamPlayer for sound effects
 	# Using a separate player means music and SFX have independent volume control
 	_sfx_player = AudioStreamPlayer.new()
-	_sfx_player.name = "SFXPlayer"
 	_sfx_player.max_polyphony = 8
 	add_child(_sfx_player)
+	_sfx_player.name = "SFXPlayer"
+	_sfx_player.bus = "SFX"
 	
 	# Connect to EventBus so any script can request audio via signals
 	EventBus.play_sfx_requested.connect(play_sfx)
