@@ -16,12 +16,23 @@
 #   + _on_land_impact(), _on_play_sfx()  event callback stubs
 #   + is_attacking(), get_attack_direction()  public accessors
 #   ~ _start_dash()  cancels active attack before dashing
-#   ~ take_damage()  cancels active attack when hit
+#   ~ take_damage()  cancels active attack when hit, updates health, triggers death
 #   ~ _handle_horizontal_movement()  applies attack_move_penalty cleanly (fixed)
 #   ~ _draw()  adds debug hitbox rectangle during active hitbox window
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerController
 extends CharacterBody2D
+
+# ─── HEALTH STATE ─────────────────────────────────────────────────────────────
+
+## Emitted whenever health changes so the HUD can update automatically
+signal health_changed(current_hp: int, max_hp: int)
+
+## The player's maximum health pool
+@export var max_health: int = 100
+
+## The player's current health
+var current_health: int
 
 
 # ─── EXPORTED MOVEMENT CONSTANTS ─────────────────────────────────────────────
@@ -238,6 +249,11 @@ func _ready() -> void:
 	# Godot disables this automatically when velocity.y < 0 (jumping upward).
 	floor_snap_length = 8.0
 
+	# ── Health Initialization ────────────────────────────────────────────────
+	current_health = max_health
+	# Defer emission slightly to ensure the HUD is fully ready to receive it
+	health_changed.call_deferred("emit", current_health, max_health)
+
 	print("[Player] Ready — position: ", global_position)
 
 
@@ -291,13 +307,20 @@ func _update_timers(delta: float) -> void:
 # ─── PUBLIC DAMAGE FUNCTION ───────────────────────────────────────────────────
 
 ## Called by hurtboxes (M4.1) and hazards (M7.6) when the player takes damage.
-## amount:           HP to remove — forwarded to EventBus for health system (Phase 5)
+## amount:                 HP to remove — forwarded to EventBus for health system (Phase 5)
 ## source_position:  world position of damage source — used to compute knockback direction.
 ##                   Pass Vector2.ZERO for hazards with no directional source.
 func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 	# Guard: already invincible — damage is ignored
 	if _is_invincible:
 		return
+
+	# ── Apply Health Damage ──────────────────────────────────────────────────
+	current_health -= amount
+	if current_health < 0:
+		current_health = 0
+		
+	health_changed.emit(current_health, max_health)
 
 	# ── Cancel active attack ← NEW M2.3 ──────────────────────────────────────
 	# Taking a hit interrupts any ongoing attack sequence.
@@ -343,6 +366,15 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 	# Phase 5 health system, Phase 11 audio, and Phase 12 VFX all listen here
 	EventBus.player_damaged.emit(amount, source_position)
 
+	# ── Trigger Death ─────────────────────────────────────────────────────────
+	if current_health <= 0:
+		die()
+
+
+func die() -> void:
+	print("[Player] Player has died!")
+	# We will add death animation or GameManager respawn logic here later
+
 
 ## Read-only check — use this instead of reading _is_invincible directly
 func is_invincible() -> bool:
@@ -351,6 +383,11 @@ func is_invincible() -> bool:
 
 ## Clears transient movement and combat state after GameManager respawns us.
 func reset_after_death() -> void:
+	# Reset Health
+	current_health = max_health
+	health_changed.emit(current_health, max_health)
+	
+	# Reset Physics & State
 	velocity = Vector2.ZERO
 	_is_jumping = false
 	_is_dashing = false
@@ -426,6 +463,7 @@ func _execute_double_jump() -> void:
 	_jump_buffer_timer       = 0.0
 	_double_jump_flash_timer = DOUBLE_JUMP_ANIM_DURATION
 	EventBus.play_sfx_requested.emit("jump")
+	
 func _start_drop_through() -> void:
 	# Temporarily remove OneWayPlatform from collision mask
 	set_collision_mask_value(DROP_THROUGH_LAYER, false)
