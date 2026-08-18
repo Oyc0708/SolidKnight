@@ -33,6 +33,8 @@ func physics_update(delta: float) -> void:
 		boss.state_machine.transition_to(^"IdleState")
 		return
 
+	boss.face_toward(boss.player_ref.global_position.x)
+
 	if _waiting_for_cooldown:
 		_cooldown_timer = max(0.0, _cooldown_timer - delta)
 		if _cooldown_timer <= 0.0:
@@ -52,7 +54,11 @@ func _on_frame_changed() -> void:
 	if boss.animated_sprite.frame != hit_frame:
 		return
 
-	if boss.player_in_attack_range and boss.player_ref and boss.player_ref.has_method("take_damage"):
+	var facing_right := boss.visuals.scale.x > 0
+	var player_is_right := boss.player_ref != null and boss.player_ref.global_position.x > boss.global_position.x
+	var facing_correct := boss.player_ref == null or facing_right == player_is_right
+
+	if boss.player_in_attack_range and facing_correct and boss.player_ref and boss.player_ref.has_method("take_damage"):
 		boss.player_ref.take_damage(damage)
 		EventBus.enemy_attacked.emit(boss)
 

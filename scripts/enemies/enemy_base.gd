@@ -1,8 +1,6 @@
 # enemy_base.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# Shared skeleton for all enemy types. Subclasses override the _on_* methods
-# to implement type-specific behavior; the state machine and player-detection
-# plumbing stays here so it isn't duplicated per enemy.
+# Shared skeleton for all enemy types. 
 #
 # MILESTONE M2.6 — Health Pickup Integration
 #   + Added drop_scene and drop_chance for loot spawning on death

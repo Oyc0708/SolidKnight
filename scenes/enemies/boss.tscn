@@ -245,16 +245,15 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
-radius = 553.01447
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h1cus"]
 size = Vector2(332, 133)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
+radius = 649.0123
 
 [node name="Boss" type="CharacterBody2D" unique_id=1453964398]
 collision_layer = 4
 script = ExtResource("1_boss")
-attack_range = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=665220512]
 shape = SubResource("RectangleShape2D_w576v")
@@ -269,20 +268,20 @@ animation = &"attack_p1"
 frame = 9
 frame_progress = 1.0
 
+[node name="AttackRangeArea" type="Area2D" parent="Visuals" unique_id=1327519297]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Visuals/AttackRangeArea" unique_id=1021503722]
+position = Vector2(-156, 66.5)
+shape = SubResource("RectangleShape2D_h1cus")
+
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1437271907]
 collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1305228493]
 shape = SubResource("CircleShape2D_detect")
-
-[node name="AttackRangeArea" type="Area2D" parent="." unique_id=1327519297]
-collision_layer = 0
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackRangeArea" unique_id=1021503722]
-position = Vector2(-156, 66.5)
-shape = SubResource("RectangleShape2D_h1cus")
 
 [node name="StateMachine" type="Node" parent="." unique_id=626529505]
 script = ExtResource("2_statemachine")
@@ -296,6 +295,7 @@ script = ExtResource("4_track")
 
 [node name="AttackPhase1State" type="Node" parent="StateMachine" unique_id=909104847]
 script = ExtResource("5_attack1")
+damage = 20
 
 [node name="AttackPhase2State" type="Node" parent="StateMachine" unique_id=1396056801]
 script = ExtResource("6_attack2")

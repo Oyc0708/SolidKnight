@@ -4,8 +4,7 @@ extends BossState
 @export var attack_cooldown: float = 1.2
 @export var damage: int = 2
 
-## Frame index within "attack_p1" where the hit lands. Tune by scrubbing
-## the animation in the SpriteFrames panel.
+## Frame index within "attack_p1" where the hit lands.
 @export var hit_frame: int = 5
 
 var _hit_landed_this_swing: bool = false
@@ -30,8 +29,7 @@ func exit() -> void:
 
 
 func physics_update(delta: float) -> void:
-	# Deliberately does NOT bail out of the swing early if the player leaves
-	# attack range mid-animation — the swing always plays to completion.
+	# Attacks play until finish
 	# Hit vs. miss is decided at the hit frame instead (see _on_frame_changed).
 	if boss.player_ref == null:
 		boss.state_machine.transition_to(^"IdleState")
@@ -56,12 +54,10 @@ func _on_frame_changed() -> void:
 	if boss.animated_sprite.frame != hit_frame:
 		return
 
-	# Only deal damage if the player is STILL in range right now — if they
-	# dodged away before the swing connected, this is a miss: no damage,
-	# but the animation keeps playing to its end regardless.
+	# Only deal damage if the player is in range right now 
 	if boss.player_in_attack_range and boss.player_ref and boss.player_ref.has_method("take_damage"):
 		boss.player_ref.take_damage(damage)
-		#EventBus.enemy_attacked.emit(boss)
+		EventBus.enemy_attacked.emit(boss)
 
 	_hit_landed_this_swing = true
 

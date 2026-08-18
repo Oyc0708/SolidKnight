@@ -1,23 +1,20 @@
 # boss.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# Boss root. Does NOT extend EnemyBase — the simple enum+match state machine
-# there doesn't fit a multi-phase boss. Instead this owns health/phase and a
-# DetectionArea for player tracking, and hands all *behavior* off to
-# StateMachine (see boss_state_machine.gd + states/*.gd).
+# Boss root. Uses StateMachine to handle Actions
 # ─────────────────────────────────────────────────────────────────────────────
 extends CharacterBody2D
 class_name Boss
 
 @export var max_health: int = 50
 @export var move_speed: float = 80.0
-@export var attack_range: float = 60.0
+#@export var attack_range: float = 60.0
 @export var phase_2_threshold: float = 0.5  # fraction of max_health remaining
 
 @onready var visuals: Node2D = $Visuals
 @onready var animated_sprite: AnimatedSprite2D = $Visuals/AnimatedSprite2D
 @onready var state_machine: BossStateMachine = $StateMachine
 @onready var detection_area: Area2D = $DetectionArea
-@onready var attack_range_area: Area2D = $AttackRangeArea
+@onready var attack_range_area: Area2D = $Visuals/AttackRangeArea
 
 var current_health: int
 var phase: int = 1
@@ -32,12 +29,11 @@ func _ready() -> void:
 	attack_range_area.body_entered.connect(_on_attack_range_entered)
 	attack_range_area.body_exited.connect(_on_attack_range_exited)
 
-	# Keep the AttackRangeArea's actual shape in sync with attack_range so
-	# there's only one number to tune, instead of the export var and the
-	# Area2D's radius silently drifting apart.
-	var shape_node: CollisionShape2D = attack_range_area.get_node("CollisionShape2D")
-	if shape_node.shape is CircleShape2D:
-		(shape_node.shape as CircleShape2D).radius = attack_range
+
+	#var shape_node: CollisionShape2D = attack_range_area.get_node("CollisionShape2D")
+	#if shape_node.shape is RectangleShape2D:
+		#(shape_node.shape as RectangleShape2D).size = Vector2(attack_range, attack_range)
+		#shape_node.position = Vector2(attack_range / 2.0, 0)
 
 
 func _on_detection_entered(body: Node2D) -> void:

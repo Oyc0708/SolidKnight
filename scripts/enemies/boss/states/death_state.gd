@@ -10,7 +10,6 @@ func enter() -> void:
 	boss.animated_sprite.play("death")
 	boss.velocity = Vector2.ZERO
 	
-	# Fix for Bug #18: Pass the global_position along with the boss node
 	EventBus.enemy_died.emit(boss, boss.global_position)
 
 	if boss.animated_sprite.sprite_frames and boss.animated_sprite.sprite_frames.has_animation("death"):
@@ -18,8 +17,6 @@ func enter() -> void:
 	else:
 		boss.queue_free()
 
-
-# Fix for Bug #13: Fallback timer to ensure the boss despawns even if the animation fails/is empty
 func _process(delta: float) -> void:
 	if _is_dead:
 		despawn_timer -= delta

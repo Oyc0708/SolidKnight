@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://ckoukomd2vaby" path="res://scripts/player/player_animation.gd" id="3_gmlin"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2qiir"]
+size = Vector2(42, 41.5)
 
 [sub_resource type="Gradient" id="Gradient_gmlin"]
 offsets = PackedFloat32Array(0.10817308, 0.48317307, 1)
@@ -24,7 +25,7 @@ script = ExtResource("1_8afob")
 [node name="Hurtbox" parent="." unique_id=2002891219 instance=ExtResource("2_lvxji")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082857435]
-position = Vector2(0, -19.5)
+position = Vector2(0, -8.75)
 shape = SubResource("RectangleShape2D_2qiir")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=958145430]
