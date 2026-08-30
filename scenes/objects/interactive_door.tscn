@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ddyxy7y3x8yq1"]
+
+[ext_resource type="Script" uid="uid://cx6n4v2d4u1c8" path="res://scripts/objects/interactive_door.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(64, 200)
+
+[node name="InteractiveDoor" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -48)
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.2, 0.5, 0.7, 1)
+polygon = PackedVector2Array(-32, 0, 32, 0, 32, -96, -32, -96)
+
+[node name="Knob" type="Polygon2D" parent="."]
+position = Vector2(20, -48)
+color = Color(0.9, 0.8, 0.2, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
+
+[node name="Label" type="Label" parent="."]
+visible = false
+offset_left = -60.0
+offset_top = -120.0
+offset_right = 60.0
+offset_bottom = -100.0
+text = "Click to Enter"
+horizontal_alignment = 1

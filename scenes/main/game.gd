@@ -32,6 +32,10 @@ func _ready() -> void:
 	# After loading the starting room, move the player to the checkpoint if one exists
 	if not GameManager.last_checkpoint_id.is_empty():
 		player.global_position = GameManager.last_checkpoint_position
+	elif map:
+		var spawn_marker := map.find_child("PlayerSpawn", true, false) as Marker2D
+		if spawn_marker:
+			player.global_position = spawn_marker.global_position
 	
 	#Debug Test
 	print("[Game] Loaded room: ", starting_room)

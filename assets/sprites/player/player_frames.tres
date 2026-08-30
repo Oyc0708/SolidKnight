@@ -600,4 +600,26 @@ animations = [{
 "loop": 1,
 "name": &"wall_slide",
 "speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yki0p")
+}],
+"loop": 0,
+"name": &"shoot",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_libmn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7st7n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2cjsu")
+}],
+"loop": 0,
+"name": &"jump_land",
+"speed": 14.0
 }]
