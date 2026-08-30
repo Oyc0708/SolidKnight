@@ -4,6 +4,10 @@
 [ext_resource type="Script" uid="uid://d32nb7qtxc5ql" path="res://scenes/menus/main_menu.gd" id="1_6bivr"]
 [ext_resource type="FontFile" uid="uid://ct2gd77blrh1f" path="res://assets/fonts/Combo-Regular.ttf" id="1_ovrgc"]
 [ext_resource type="FontFile" uid="uid://d3f2jrt3nbajo" path="res://assets/fonts/AlmendraSC-Regular.ttf" id="1_xqga4"]
+[ext_resource type="Texture2D" uid="uid://bh5rulu46q1fx" path="res://assets/ui/32x32-Tilesheet.png" id="5_imvie"]
+[ext_resource type="FontFile" uid="uid://cgudtsoe0gvji" path="res://assets/fonts/ARCADECLASSIC.TTF" id="6_ng0o5"]
+[ext_resource type="Texture2D" uid="uid://ceenxyl6r7che" path="res://assets/ui/grabber.png" id="7_8r73w"]
+[ext_resource type="Script" uid="uid://cjydcb1qu2ply" path="res://scenes/menus/audio_slider.gd" id="8_1hnlc"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2o76q"]
 texture = ExtResource("1_2o76q")
@@ -12,67 +16,99 @@ modulate_color = Color(0.70380783, 0.70380783, 0.70380783, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xqga4"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="MainMenu" type="Control" unique_id=1442169281]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ng0o5"]
+atlas = ExtResource("5_imvie")
+region = Rect2(304.218, 16.675, 63.635, 62.322)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8r73w"]
+atlas = ExtResource("5_imvie")
+region = Rect2(290.11603, 263.32446, 92.08783, 15.108154)
+
+[sub_resource type="Theme" id="Theme_1hnlc"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1hnlc"]
+atlas = ExtResource("5_imvie")
+region = Rect2(319.88, 106.001, 32.109, 15.001)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_imvie"]
+texture = SubResource("AtlasTexture_1hnlc")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_50h1w"]
+atlas = ExtResource("5_imvie")
+region = Rect2(287.985, 105.961, 32.038, 15.076)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8r73w"]
+texture = SubResource("AtlasTexture_50h1w")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_88kup"]
+atlas = ExtResource("5_imvie")
+region = Rect2(287.985, 105.961, 32.038, 15.076)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bre17"]
+texture = SubResource("AtlasTexture_88kup")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_euy4r"]
+atlas = ExtResource("5_imvie")
+region = Rect2(287.985, 105.961, 32.038, 15.076)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_50h1w"]
+texture = SubResource("AtlasTexture_euy4r")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bre17"]
+atlas = ExtResource("5_imvie")
+region = Rect2(304.218, 16.675, 63.635, 62.322)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bh4e2"]
+atlas = ExtResource("5_imvie")
+region = Rect2(290.11603, 263.32446, 92.08783, 15.108154)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3w8rc"]
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+expand_margin_top = 3.0
+expand_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uxao6"]
+bg_color = Color(0.78431374, 0.7254902, 0.65882355, 1)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+expand_margin_top = 3.0
+expand_margin_bottom = 3.0
+
+[node name="MainMenu" type="CanvasLayer" unique_id=644983576 node_paths=PackedStringArray("main_menu_panel", "settings_panel", "audio_panel")]
+script = ExtResource("1_6bivr")
+main_menu_panel = NodePath("Control/MainMenuPanel")
+settings_panel = NodePath("Control/SettingsPanel")
+audio_panel = NodePath("Control/AudioPanel")
+
+[node name="Control" type="Control" parent="." unique_id=1864567493]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_6bivr")
 
-[node name="Panel" type="Panel" parent="." unique_id=1933249123]
+[node name="MainMenuPanel" type="Panel" parent="Control" unique_id=1933249123]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -6.1035156e-05
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_2o76q")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1396963622]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -153.0
-offset_top = -69.0
-offset_right = 150.0
-offset_bottom = 126.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Start button" type="Button" parent="VBoxContainer" unique_id=1974195853]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_fonts/font = ExtResource("1_ovrgc")
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
-text = "Start game"
-
-[node name="Settings button" type="Button" parent="VBoxContainer" unique_id=141040021]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_fonts/font = ExtResource("1_ovrgc")
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
-text = "Settings"
-
-[node name="Exit button" type="Button" parent="VBoxContainer" unique_id=2087139298]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_fonts/font = ExtResource("1_ovrgc")
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
-text = "Exit"
-
-[node name="Label" type="Label" parent="." unique_id=2068365959]
+[node name="Label" type="Label" parent="Control/MainMenuPanel" unique_id=2068365959]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -87,6 +123,294 @@ theme_override_font_sizes/font_size = 120
 text = "SolidKnight"
 horizontal_alignment = 1
 
-[connection signal="pressed" from="VBoxContainer/Start button" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="VBoxContainer/Settings button" to="." method="_on_settings_pressed"]
-[connection signal="pressed" from="VBoxContainer/Exit button" to="." method="_on_exit_pressed"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/MainMenuPanel" unique_id=1396963622]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -153.0
+offset_top = -68.99997
+offset_right = 150.0
+offset_bottom = 126.00003
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Start button" type="Button" parent="Control/MainMenuPanel/VBoxContainer" unique_id=1974195853]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Start game"
+
+[node name="Settings button" type="Button" parent="Control/MainMenuPanel/VBoxContainer" unique_id=141040021]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Settings"
+
+[node name="Exit button" type="Button" parent="Control/MainMenuPanel/VBoxContainer" unique_id=2087139298]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_fonts/font = ExtResource("1_ovrgc")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_xqga4")
+text = "Exit"
+
+[node name="SettingsPanel" type="Panel" parent="Control" unique_id=1506249342]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/SettingsPanel" unique_id=189187146]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -271.0
+offset_top = -316.5
+offset_right = 271.0
+offset_bottom = 316.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_ng0o5")
+region_rect = Rect2(-0.757, 0.723, 65.619, 61.316)
+
+[node name="TextureRect" type="TextureRect" parent="Control/SettingsPanel/NinePatchRect" unique_id=1112092126]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -152.0
+offset_top = -217.5
+offset_right = 152.0
+offset_bottom = -143.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_8r73w")
+
+[node name="SettingsLabel" type="Label" parent="Control/SettingsPanel/NinePatchRect" unique_id=373156743]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -111.0
+offset_top = 170.0
+offset_right = 122.0
+offset_bottom = 225.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 53
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/SettingsPanel/NinePatchRect" unique_id=259822348]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -96.0
+offset_top = -76.5
+offset_right = 104.0
+offset_bottom = 196.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="AudioButton" type="Button" parent="Control/SettingsPanel/NinePatchRect/VBoxContainer" unique_id=1064856359]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme = SubResource("Theme_1hnlc")
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxTexture_imvie")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_8r73w")
+theme_override_styles/hover = SubResource("StyleBoxTexture_bre17")
+text = "Audio"
+
+[node name="BackButton" type="Button" parent="Control/SettingsPanel/NinePatchRect/VBoxContainer" unique_id=1762842180]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxTexture_imvie")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_50h1w")
+theme_override_styles/hover = SubResource("StyleBoxTexture_bre17")
+text = "Back"
+
+[node name="AudioPanel" type="Panel" parent="Control" unique_id=1677249372]
+visible = false
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/AudioPanel" unique_id=1054395978]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -464.5
+offset_top = -316.5
+offset_right = 464.5
+offset_bottom = 316.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_bre17")
+region_rect = Rect2(-0.757, 0.723, 65.619, 61.316)
+
+[node name="TextureRect" type="TextureRect" parent="Control/AudioPanel/NinePatchRect" unique_id=230957460]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -199.0
+offset_top = 90.0
+offset_right = 199.0
+offset_bottom = 164.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_bh4e2")
+
+[node name="AudioLabel" type="Label" parent="Control/AudioPanel/NinePatchRect" unique_id=2090981579]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -109.5
+offset_top = 160.0
+offset_right = 123.5
+offset_bottom = 231.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 70
+text = "Audio"
+horizontal_alignment = 1
+
+[node name="Slider" type="VBoxContainer" parent="Control/AudioPanel/NinePatchRect" unique_id=1898311085]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -44.5
+offset_top = -67.5
+offset_right = 265.5
+offset_bottom = 148.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 45
+
+[node name="MasterVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=1641567558]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("7_8r73w")
+theme_override_icons/grabber_highlight = ExtResource("7_8r73w")
+theme_override_styles/slider = SubResource("StyleBoxFlat_3w8rc")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_uxao6")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_uxao6")
+max_value = 1.0
+step = 0.01
+script = ExtResource("8_1hnlc")
+audio_bus_name = "Master"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=1117158146]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("7_8r73w")
+theme_override_icons/grabber_highlight = ExtResource("7_8r73w")
+theme_override_styles/slider = SubResource("StyleBoxFlat_3w8rc")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_uxao6")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_uxao6")
+max_value = 1.0
+step = 0.01
+value = 1.0
+script = ExtResource("8_1hnlc")
+audio_bus_name = "Music"
+
+[node name="SFXVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=2108384689]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("7_8r73w")
+theme_override_icons/grabber_highlight = ExtResource("7_8r73w")
+theme_override_styles/slider = SubResource("StyleBoxFlat_3w8rc")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_uxao6")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_uxao6")
+max_value = 1.0
+step = 0.01
+value = 1.0
+script = ExtResource("8_1hnlc")
+audio_bus_name = "SFX"
+
+[node name="Label" type="VBoxContainer" parent="Control/AudioPanel/NinePatchRect" unique_id=104420061]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 200.0
+offset_top = -61.5
+offset_right = 377.0
+offset_bottom = 116.5
+grow_vertical = 2
+theme_override_constants/separation = 50
+
+[node name="MasterVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=51396585]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 25
+text = "Master Volume"
+
+[node name="MusicVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=1485450130]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 25
+text = "Music Volume"
+
+[node name="SFXVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=41992342]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 25
+text = "SFX Volume"
+
+[node name="BackButton" type="Button" parent="Control/AudioPanel/NinePatchRect" unique_id=630001035]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 153.5
+offset_right = 100.0
+offset_bottom = 213.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_ng0o5")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxTexture_imvie")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_50h1w")
+theme_override_styles/hover = SubResource("StyleBoxTexture_bre17")
+text = "Back"
+
+[connection signal="pressed" from="Control/MainMenuPanel/VBoxContainer/Start button" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="Control/MainMenuPanel/VBoxContainer/Settings button" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="Control/MainMenuPanel/VBoxContainer/Exit button" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="Control/SettingsPanel/NinePatchRect/VBoxContainer/AudioButton" to="." method="_on_audio_button_pressed"]
+[connection signal="pressed" from="Control/SettingsPanel/NinePatchRect/VBoxContainer/BackButton" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="Control/AudioPanel/NinePatchRect/BackButton" to="." method="_on_audio_back_button_pressed"]

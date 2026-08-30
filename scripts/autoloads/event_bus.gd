@@ -70,7 +70,8 @@ signal inventory_opened()
 signal inventory_closed()
 signal map_opened()
 signal map_closed()
-
+signal open_settings_requested()
+signal settings_closed()
 
 # ─── ITEMS ───────────────────────────────────────────────────────────────────
 signal item_collected(item_id: String)

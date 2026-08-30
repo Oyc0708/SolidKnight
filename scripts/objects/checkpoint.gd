@@ -20,7 +20,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group(&"player"):
 		return
 
-	# Always set the checkpoint when the player touches it, allowing reuse (Fix for Bug #19)
+	# Always set the checkpoint when the player touches it, allowing reuse
 	GameManager.set_checkpoint(checkpoint_id, global_position, _get_owning_room_path())
 
 	# Only fire the visual/audio feedback event once

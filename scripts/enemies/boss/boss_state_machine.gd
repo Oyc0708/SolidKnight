@@ -1,15 +1,11 @@
 # boss_state_machine.gd
 # ─────────────────────────────────────────────────────────────────────────────
-# Generic state machine: holds whichever BossState child is active, calls
-# enter()/exit() on transition, and forwards _physics_process to the active
-# state. States transition by calling boss.state_machine.transition_to(path),
-# where path is a child NodePath relative to this node (e.g. ^"TrackState").
+# state machine: holds whichever BossState child is active, calls
+# enter()/exit() on transition
 # ─────────────────────────────────────────────────────────────────────────────
 extends Node
 class_name BossStateMachine
 
-## Path (relative to this node) of the state to enter on _ready(). Set in the
-## Inspector — usually ^"IdleState".
 @export var initial_state: NodePath
 
 var current_state: BossState
@@ -24,9 +20,7 @@ func _ready() -> void:
 
 	if initial_state != NodePath():
 		current_state = get_node(initial_state)
-		# Deferred: children's _ready() runs before the parent's (Boss's), so
-		# boss.animated_sprite etc. aren't assigned yet if we call enter() here
-		# directly. call_deferred runs this after the whole ready chain finishes.
+		
 		current_state.call_deferred("enter")
 
 
