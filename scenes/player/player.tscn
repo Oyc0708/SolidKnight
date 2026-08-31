@@ -4,6 +4,7 @@
 [ext_resource type="SpriteFrames" uid="uid://dnxmwddbhlc2m" path="res://assets/sprites/player/player_frames.tres" id="2_dovo2"]
 [ext_resource type="PackedScene" uid="uid://csjjnc5kjmeum" path="res://scenes/combat/hurtbox.tscn" id="2_lvxji"]
 [ext_resource type="Script" uid="uid://ckoukomd2vaby" path="res://scripts/player/player_animation.gd" id="3_gmlin"]
+[ext_resource type="PackedScene" uid="uid://c41nv4l8mw52s" path="res://scenes/combat/hitbox.tscn" id="4_hitbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2qiir"]
 size = Vector2(42, 41.5)

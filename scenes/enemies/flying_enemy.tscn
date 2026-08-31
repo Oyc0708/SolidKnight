@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bk3n7rh4q9cwm"]
+
+[ext_resource type="Script" uid="uid://cgr8x5fj2m1kw" path="res://scripts/enemies/flying_enemy.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://est0ekaxvo76" path="res://scripts/enemies/heart_pickup.tscn" id="2_heart"]
+[ext_resource type="PackedScene" uid="uid://csjjnc5kjmeum" path="res://scenes/combat/hurtbox.tscn" id="3_hurtbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 10.0
+
+[node name="FlyingEnemy" type="CharacterBody2D"]
+motion_mode = 1
+collision_layer = 4
+script = ExtResource("1_script")
+drop_scene = ExtResource("2_heart")
+drop_chance = 0.4
+detection_range = 180.0
+attack_range = 32.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Placeholder" type="Polygon2D" parent="Visuals"]
+color = Color(0.2, 0.4, 0.85, 1)
+polygon = PackedVector2Array(0, -14, 11, 0, 0, 14, -11, 0)
+
+[node name="Label" type="Label" parent="."]
+offset_left = -35.0
+offset_top = -32.0
+offset_right = 35.0
+offset_bottom = -14.0
+text = "Flying Enemy"
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Hurtbox" parent="." node_paths=PackedStringArray("owner_node") instance=ExtResource("3_hurtbox")]
+collision_layer = 16
+owner_node = NodePath("..")

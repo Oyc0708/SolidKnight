@@ -815,7 +815,28 @@ func _on_attack_started() -> void:
 ## active=true: hitbox window opens.  active=false: hitbox window closes.
 func _on_attack_hitbox_active(active: bool) -> void:
 	_debug_hitbox_active = active
-	print("[Player] Hitbox active: ", active)
+	
+	var hitbox = get_node_or_null("Hitbox")
+	if hitbox:
+		# Update position based on direction before activating
+		if active:
+			var hitbox_shape = hitbox.get_node_or_null("Hitbox")
+			if hitbox_shape:
+				if _attack_direction == "up":
+					hitbox.position = Vector2(0, -45)
+					hitbox_shape.shape.size = Vector2(40, 40)
+				elif _attack_direction == "down":
+					hitbox.position = Vector2(0, 15)
+					hitbox_shape.shape.size = Vector2(40, 40)
+				else: # neutral
+					var dx = 35 * sign(facing_direction) if facing_direction != 0 else 35
+					hitbox.position = Vector2(dx, -15)
+					hitbox_shape.shape.size = Vector2(40, 50)
+					
+		# Safely toggle monitoring
+		hitbox.set_deferred("monitoring", active)
+		
+	print("[Player] Hitbox active: ", active, " dir: ", _attack_direction)
 
 
 ## Called at t=0.55 of attack_01 (t=0.28 of attack_up/down) — ends the attack state.
@@ -824,6 +845,9 @@ func _on_attack_finished() -> void:
 	_is_attacking        = false
 	_attack_direction    = "neutral"
 	_debug_hitbox_active = false
+	var hitbox = get_node_or_null("Hitbox")
+	if hitbox:
+		hitbox.set_deferred("monitoring", false)
 	print("[Player] Attack finished")
 
 

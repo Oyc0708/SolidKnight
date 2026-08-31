@@ -25,7 +25,7 @@ position = Vector2(720.09485, 495.3853)
 position = Vector2(1104, 474)
 
 [node name="ExampleEnemy" parent="Enemies" unique_id=1484103932 node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("2_i2g2l")]
-position = Vector2(389, 420)
+position = Vector2(576, 272)
 patrol_point_a = NodePath("../PatrolA")
 patrol_point_b = NodePath("../PatrolB")
 
@@ -33,10 +33,10 @@ patrol_point_b = NodePath("../PatrolB")
 position = Vector2(289, 415)
 
 [node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1111150664]
-position = Vector2(564, 414)
+position = Vector2(713, 417)
 
 [node name="Boss" parent="Enemies" unique_id=695709896 instance=ExtResource("3_u82t8")]
-position = Vector2(240, 352)
+position = Vector2(-214, 309)
 
 [node name="Checkpoints" type="Node2D" parent="." unique_id=509300861]
 position = Vector2(631, 632)
