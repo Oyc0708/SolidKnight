@@ -1,23 +1,89 @@
 [gd_scene format=3 uid="uid://sqe7a4i06hp1"]
 
 [ext_resource type="Script" uid="uid://7l2jn85jjy3x" path="res://scenes/menus/pause_menu.gd" id="1_fwndu"]
-[ext_resource type="Texture2D" uid="uid://cqp2qccbxyh8a" path="res://assets/ui/pause_button.png" id="2_7unhi"]
+[ext_resource type="Texture2D" uid="uid://bh5rulu46q1fx" path="res://assets/ui/32x32-Tilesheet.png" id="2_2wrho"]
+[ext_resource type="FontFile" uid="uid://cgudtsoe0gvji" path="res://assets/fonts/ARCADECLASSIC.TTF" id="2_gh0u6"]
+[ext_resource type="Texture2D" uid="uid://ceenxyl6r7che" path="res://assets/ui/grabber.png" id="4_2wrho"]
+[ext_resource type="Script" uid="uid://cjydcb1qu2ply" path="res://scenes/menus/audio_slider.gd" id="5_gh0u6"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_xrivr"]
-atlas = ExtResource("2_7unhi")
-region = Rect2(223.29755, -0.0065258145, 17.385803, 16.392323)
+[sub_resource type="AtlasTexture" id="AtlasTexture_l1erw"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(287.985, 105.961, 32.038, 15.076)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_13qdw"]
-atlas = ExtResource("2_7unhi")
-region = Rect2(239.72803, 1.3535237, 16.805298, 15.429451)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_coonu"]
+texture = SubResource("AtlasTexture_l1erw")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gdsik"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ae3m"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(319.8799, 106.00078, 32.109253, 15.000984)
 
-[node name="PauseMenu" type="CanvasLayer" unique_id=917024324 node_paths=PackedStringArray("pause_panel")]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3662s"]
+texture = SubResource("AtlasTexture_7ae3m")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tg2s5"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(287.985, 105.961, 32.038, 15.076)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7mpdc"]
+texture = SubResource("AtlasTexture_tg2s5")
+
+[sub_resource type="Theme" id="Theme_vtrmx"]
+Button/font_sizes/font_size = 30
+Button/fonts/font = ExtResource("2_gh0u6")
+Button/styles/hover = SubResource("StyleBoxTexture_coonu")
+Button/styles/normal = SubResource("StyleBoxTexture_3662s")
+Button/styles/pressed = SubResource("StyleBoxTexture_7mpdc")
+Label/font_sizes/font_size = 16
+Label/fonts/font = ExtResource("2_gh0u6")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_25bs2"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(304.218, 16.675243, 63.634613, 62.321766)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7f2x3"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(290.11603, 263.32446, 92.08783, 15.108154)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3xdnl"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(304.218, 16.675, 63.635, 62.322)
+
+[sub_resource type="Theme" id="Theme_xrivr"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e3hg0"]
+atlas = ExtResource("2_2wrho")
+region = Rect2(304.218, 16.675, 63.635, 62.322)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eyfc8"]
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+expand_margin_top = 3.0
+expand_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xiui8"]
+bg_color = Color(0.78431374, 0.7254902, 0.65882355, 1)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+expand_margin_top = 3.0
+expand_margin_bottom = 3.0
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=917024324 node_paths=PackedStringArray("pause_panel", "settings_panel", "audio_panel", "level_select_panel")]
 process_mode = 3
 script = ExtResource("1_fwndu")
 pause_panel = NodePath("Control/PausePanel")
+settings_panel = NodePath("Control/SettingsPanel")
+audio_panel = NodePath("Control/AudioPanel")
+level_select_panel = NodePath("Control/LevelSelectPanel")
 
 [node name="Control" type="Control" parent="." unique_id=1920734756]
 layout_mode = 3
@@ -26,18 +92,121 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="PauseButton" type="TextureButton" parent="Control" unique_id=792177063]
-layout_mode = 0
-offset_left = 1152.0
-offset_top = 32.0
-offset_right = 1242.0
-offset_bottom = 106.0
-texture_normal = SubResource("AtlasTexture_xrivr")
-texture_pressed = SubResource("AtlasTexture_13qdw")
-stretch_mode = 5
+mouse_filter = 2
+theme = SubResource("Theme_vtrmx")
 
 [node name="PausePanel" type="Panel" parent="Control" unique_id=343367511]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/PausePanel" unique_id=1459193656]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -464.5
+offset_top = -316.5
+offset_right = 464.5
+offset_bottom = 316.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_25bs2")
+region_rect = Rect2(-0.7570033, 0.7228155, 65.61939, 61.31588)
+
+[node name="TextureRect" type="TextureRect" parent="Control/PausePanel/NinePatchRect" unique_id=517722707]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -152.0
+offset_top = 99.0
+offset_right = 152.0
+offset_bottom = 173.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_7f2x3")
+
+[node name="PausedLabel" type="Label" parent="Control/PausePanel/NinePatchRect" unique_id=301963550]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -111.0
+offset_top = -146.5
+offset_right = 122.0
+offset_bottom = -91.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 53
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/PausePanel/NinePatchRect" unique_id=1572997136]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -232.25
+offset_top = -56.5
+offset_right = -32.25
+offset_bottom = 163.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="ResumeButton" type="Button" parent="Control/PausePanel/NinePatchRect/VBoxContainer" unique_id=1599455442]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = " Resume"
+
+[node name="RestartButton" type="Button" parent="Control/PausePanel/NinePatchRect/VBoxContainer" unique_id=652086696]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = " Restart "
+
+[node name="LevelSelectButton" type="Button" parent="Control/PausePanel/NinePatchRect/VBoxContainer" unique_id=44297931]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 25
+text = " Level Select"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Control/PausePanel/NinePatchRect" unique_id=1102443144]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 260.0
+offset_right = 700.0
+offset_bottom = 400.0
+theme_override_constants/separation = 20
+
+[node name="SettingsButton" type="Button" parent="Control/PausePanel/NinePatchRect/VBoxContainer2" unique_id=2111861203]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Settings"
+
+[node name="MainMenuButton" type="Button" parent="Control/PausePanel/NinePatchRect/VBoxContainer2" unique_id=930575579]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "  Main  Menu "
+
+[node name="SettingsPanel" type="Panel" parent="Control" unique_id=927697814]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -46,65 +215,359 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/PausePanel" unique_id=1572997136]
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/SettingsPanel" unique_id=2014101856]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -96.5
-offset_top = -104.5
-offset_right = 96.5
-offset_bottom = 104.5
+offset_left = -271.0
+offset_top = -316.5
+offset_right = 271.0
+offset_bottom = 316.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 11
+texture = SubResource("AtlasTexture_3xdnl")
+region_rect = Rect2(-0.757, 0.723, 65.619, 61.316)
 
-[node name="ResumeButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=1599455442]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_font_sizes/font_size = 23
-theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
-text = "Resume "
+[node name="TextureRect" type="TextureRect" parent="Control/SettingsPanel/NinePatchRect" unique_id=1487072123]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -152.0
+offset_top = -217.5
+offset_right = 152.0
+offset_bottom = -143.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_7f2x3")
 
-[node name="RestartButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=652086696]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_font_sizes/font_size = 23
-theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
-text = "Restart "
-
-[node name="SettingsButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=2111861203]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_font_sizes/font_size = 23
-theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
-text = "Settings"
-
-[node name="MainMenuButton" type="Button" parent="Control/PausePanel/VBoxContainer" unique_id=930575579]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
-theme_override_font_sizes/font_size = 23
-theme_override_styles/normal = SubResource("StyleBoxFlat_gdsik")
-text = "Main Menu "
-
-[node name="Label" type="Label" parent="Control/PausePanel" unique_id=301963550]
+[node name="SettingsLabel" type="Label" parent="Control/SettingsPanel/NinePatchRect" unique_id=2082623206]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -97.0
-offset_top = 167.0
-offset_right = 96.0
-offset_bottom = 209.0
+offset_left = -111.0
+offset_top = 170.0
+offset_right = 122.0
+offset_bottom = 225.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 30
-text = "PAUSED"
+theme_override_font_sizes/font_size = 53
+text = "Settings"
 horizontal_alignment = 1
 
-[connection signal="pressed" from="Control/PauseButton" to="." method="_on_pause_button_pressed"]
-[connection signal="pressed" from="Control/PausePanel/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
-[connection signal="pressed" from="Control/PausePanel/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
-[connection signal="pressed" from="Control/PausePanel/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="Control/PausePanel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/SettingsPanel/NinePatchRect" unique_id=139101555]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -96.0
+offset_top = -76.5
+offset_right = 104.0
+offset_bottom = 196.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="AudioButton" type="Button" parent="Control/SettingsPanel/NinePatchRect/VBoxContainer" unique_id=1563553644]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme = SubResource("Theme_xrivr")
+text = "Audio"
+
+[node name="BackButton" type="Button" parent="Control/SettingsPanel/NinePatchRect/VBoxContainer" unique_id=1429846824]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+text = "Back"
+
+[node name="AudioPanel" type="Panel" parent="Control" unique_id=993597273]
+visible = false
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/AudioPanel" unique_id=1778514669]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -464.5
+offset_top = -316.5
+offset_right = 464.5
+offset_bottom = 316.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_e3hg0")
+region_rect = Rect2(-0.757, 0.723, 65.619, 61.316)
+
+[node name="TextureRect" type="TextureRect" parent="Control/AudioPanel/NinePatchRect" unique_id=1201712339]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -199.0
+offset_top = 90.0
+offset_right = 199.0
+offset_bottom = 164.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_7f2x3")
+
+[node name="AudioLabel" type="Label" parent="Control/AudioPanel/NinePatchRect" unique_id=405474038]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -109.5
+offset_top = 160.0
+offset_right = 123.5
+offset_bottom = 231.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 70
+text = "Audio"
+horizontal_alignment = 1
+
+[node name="Slider" type="VBoxContainer" parent="Control/AudioPanel/NinePatchRect" unique_id=2027940755]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -44.5
+offset_top = -67.5
+offset_right = 265.5
+offset_bottom = 148.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 45
+
+[node name="MasterVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=213049500]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("4_2wrho")
+theme_override_icons/grabber_highlight = ExtResource("4_2wrho")
+theme_override_styles/slider = SubResource("StyleBoxFlat_eyfc8")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_xiui8")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_xiui8")
+max_value = 1.0
+step = 0.01
+value = 1.0
+script = ExtResource("5_gh0u6")
+audio_bus_name = "Master"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=1587217545]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("4_2wrho")
+theme_override_icons/grabber_highlight = ExtResource("4_2wrho")
+theme_override_styles/slider = SubResource("StyleBoxFlat_eyfc8")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_xiui8")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_xiui8")
+max_value = 1.0
+step = 0.01
+value = 1.0
+script = ExtResource("5_gh0u6")
+audio_bus_name = "Music"
+
+[node name="SFXVolumeSlider" type="HSlider" parent="Control/AudioPanel/NinePatchRect/Slider" unique_id=851172776]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("4_2wrho")
+theme_override_icons/grabber_highlight = ExtResource("4_2wrho")
+theme_override_styles/slider = SubResource("StyleBoxFlat_eyfc8")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_xiui8")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_xiui8")
+max_value = 1.0
+step = 0.01
+value = 1.0
+script = ExtResource("5_gh0u6")
+audio_bus_name = "SFX"
+
+[node name="Label" type="VBoxContainer" parent="Control/AudioPanel/NinePatchRect" unique_id=1002607322]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 200.0
+offset_top = -61.5
+offset_right = 377.0
+offset_bottom = 116.5
+grow_vertical = 2
+theme_override_constants/separation = 50
+
+[node name="MasterVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=169413889]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Master Volume"
+
+[node name="MusicVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=374847725]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Music Volume"
+
+[node name="SFXVolumeLabel" type="Label" parent="Control/AudioPanel/NinePatchRect/Label" unique_id=1369032066]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "SFX Volume"
+
+[node name="BackButton" type="Button" parent="Control/AudioPanel/NinePatchRect" unique_id=1981108692]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 153.5
+offset_right = 100.0
+offset_bottom = 213.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Back"
+
+[node name="LevelSelectPanel" type="Panel" parent="Control" unique_id=1379094068]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Control/LevelSelectPanel" unique_id=2044118633]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -464.5
+offset_top = -316.5
+offset_right = 464.5
+offset_bottom = 316.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_25bs2")
+region_rect = Rect2(-0.7570033, 0.7228155, 65.61939, 61.31588)
+
+[node name="TextureRect" type="TextureRect" parent="Control/LevelSelectPanel/NinePatchRect" unique_id=1751079276]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -152.0
+offset_top = 99.0
+offset_right = 152.0
+offset_bottom = 173.0
+grow_horizontal = 2
+texture = SubResource("AtlasTexture_7f2x3")
+
+[node name="LevelSelectLabel" type="Label" parent="Control/LevelSelectPanel/NinePatchRect" unique_id=741810865]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -111.0
+offset_top = -146.5
+offset_right = 122.0
+offset_bottom = -91.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 53
+text = "Level Select"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/LevelSelectPanel/NinePatchRect" unique_id=477806655]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 232.25
+offset_top = -36.5
+offset_right = 432.25
+offset_bottom = 103.5
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="BossRoomButton" type="Button" parent="Control/LevelSelectPanel/NinePatchRect/VBoxContainer" unique_id=1389588900]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Boss Room"
+
+[node name="ZoneAButton" type="Button" parent="Control/LevelSelectPanel/NinePatchRect/VBoxContainer" unique_id=1512339043]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Zone A"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Control/LevelSelectPanel/NinePatchRect" unique_id=654093093]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -429.0
+offset_top = -36.5
+offset_right = -229.0
+offset_bottom = 103.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 11
+
+[node name="ZoneBButton" type="Button" parent="Control/LevelSelectPanel/NinePatchRect/VBoxContainer2" unique_id=1004846856]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Zone B"
+
+[node name="ZoneCButton" type="Button" parent="Control/LevelSelectPanel/NinePatchRect/VBoxContainer2" unique_id=1513939962]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Zone C"
+
+[node name="BackButton" type="Button" parent="Control/LevelSelectPanel/NinePatchRect" unique_id=630387558]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -168.0
+offset_right = 100.0
+offset_bottom = -108.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 30
+text = "Back"
+
+[connection signal="pressed" from="Control/PausePanel/NinePatchRect/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/NinePatchRect/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/NinePatchRect/VBoxContainer/LevelSelectButton" to="." method="_on_level_select_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/NinePatchRect/VBoxContainer2/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Control/PausePanel/NinePatchRect/VBoxContainer2/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="Control/SettingsPanel/NinePatchRect/VBoxContainer/AudioButton" to="." method="_on_audio_button_pressed"]
+[connection signal="pressed" from="Control/SettingsPanel/NinePatchRect/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Control/AudioPanel/NinePatchRect/BackButton" to="." method="_on_audio_back_button_pressed"]
+[connection signal="pressed" from="Control/LevelSelectPanel/NinePatchRect/VBoxContainer/BossRoomButton" to="." method="_on_boss_room_button_pressed"]
+[connection signal="pressed" from="Control/LevelSelectPanel/NinePatchRect/VBoxContainer/ZoneAButton" to="." method="_on_zone_a_button_pressed"]
+[connection signal="pressed" from="Control/LevelSelectPanel/NinePatchRect/VBoxContainer2/ZoneBButton" to="." method="_on_zone_b_button_pressed"]
+[connection signal="pressed" from="Control/LevelSelectPanel/NinePatchRect/VBoxContainer2/ZoneCButton" to="." method="_on_zone_c_button_pressed"]
+[connection signal="pressed" from="Control/LevelSelectPanel/NinePatchRect/BackButton" to="." method="_on_level_select_back_button_pressed"]

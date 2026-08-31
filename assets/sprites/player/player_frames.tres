@@ -353,12 +353,12 @@ animations = [{
 "speed": 20.0
 }, {
 "frames": [],
-"loop": 0,
+"loop": 1,
 "name": &"attack_down",
 "speed": 5.0
 }, {
 "frames": [],
-"loop": 0,
+"loop": 1,
 "name": &"attack_up",
 "speed": 5.0
 }, {
@@ -577,7 +577,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_5vjwi")
 }],
-"loop": 0,
+"loop": 1,
 "name": &"walk",
 "speed": 10.0
 }, {

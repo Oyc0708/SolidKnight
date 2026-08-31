@@ -14,8 +14,8 @@ starting_room = "uid://bcvcw6tgrbkr2"
 [node name="RemoteTransform2D" type="RemoteTransform2D" parent="Player" unique_id=1576691063]
 remote_path = NodePath("../../Camera2D")
 
-[node name="PauseMenu" parent="." unique_id=917024324 instance=ExtResource("4_gf1f2")]
-
 [node name="PlayerHud" parent="." unique_id=1738001189 instance=ExtResource("4_gsayk")]
+
+[node name="PauseMenu" parent="." unique_id=917024324 instance=ExtResource("4_gf1f2")]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1400915417]

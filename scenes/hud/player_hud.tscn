@@ -1,25 +1,19 @@
 [gd_scene format=3 uid="uid://7xubr0dxu3ku"]
 
 [ext_resource type="Script" uid="uid://bd8yulrongsf3" path="res://scenes/hud/heart_container.gd" id="1_0fsuj"]
+[ext_resource type="Script" uid="uid://by1a7shhs7xkb" path="res://scenes/hud/player_hud.gd" id="1_17prt"]
 [ext_resource type="Texture2D" uid="uid://cd8d4b0fb22t3" path="res://assets/ui/hud/Heart_Full.png" id="2_cfmin"]
+[ext_resource type="Texture2D" uid="uid://bh5rulu46q1fx" path="res://assets/ui/32x32-Tilesheet.png" id="3_3dwfp"]
+[ext_resource type="Script" uid="uid://bmj2nvt0oralh" path="res://scenes/hud/pause_button.gd" id="4_3dwfp"]
+[ext_resource type="Texture2D" uid="uid://6ab5uplderc" path="res://assets/ui/icon_normal.png" id="5_1g7pp"]
 
-[sub_resource type="GDScript" id="GDScript_0fsuj"]
-script/source = "extends CanvasLayer
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-"
+[sub_resource type="AtlasTexture" id="AtlasTexture_byfoi"]
+atlas = ExtResource("3_3dwfp")
+region = Rect2(224.41985, 99.650475, 31, 29)
 
 [node name="PlayerHud" type="CanvasLayer" unique_id=1738001189]
 process_mode = 3
-script = SubResource("GDScript_0fsuj")
+script = ExtResource("1_17prt")
 
 [node name="heart" type="Control" parent="." unique_id=1579743770]
 layout_mode = 3
@@ -64,3 +58,31 @@ stretch_mode = 2
 layout_mode = 2
 texture = ExtResource("2_cfmin")
 stretch_mode = 2
+
+[node name="PauseButton" type="TextureButton" parent="heart" unique_id=276830243]
+layout_mode = 0
+offset_left = 1135.0
+offset_top = 35.0
+offset_right = 1205.0
+offset_bottom = 106.0
+focus_mode = 0
+texture_normal = SubResource("AtlasTexture_byfoi")
+stretch_mode = 5
+script = ExtResource("4_3dwfp")
+
+[node name="PauseIcon" type="TextureRect" parent="heart/PauseButton" unique_id=351793300]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -12.5
+offset_right = 14.0
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_1g7pp")
+
+[connection signal="pressed" from="heart/PauseButton" to="." method="_on_pause_button_pressed"]
