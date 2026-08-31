@@ -5,7 +5,6 @@
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="3_ahe6h"]
 [ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_i2g2l"]
 [ext_resource type="PackedScene" uid="uid://b4kg5hyvdfovb" path="res://scenes/enemies/boss.tscn" id="3_u82t8"]
-[ext_resource type="PackedScene" uid="uid://ddyxy7y3x8yq1" path="res://scenes/objects/interactive_door.tscn" id="4_door"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u82t8"]
 size = Vector2(1923, 991)

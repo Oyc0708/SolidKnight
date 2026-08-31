@@ -25,6 +25,12 @@ script = ExtResource("1_8afob")
 
 [node name="Hurtbox" parent="." unique_id=2002891219 instance=ExtResource("2_lvxji")]
 
+[node name="Hitbox" parent="." unique_id=674390234 instance=ExtResource("4_hitbox")]
+collision_layer = 0
+collision_mask = 16
+monitoring = false
+damage = 25
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082857435]
 position = Vector2(0, -11.25)
 shape = SubResource("RectangleShape2D_2qiir")
