@@ -2,7 +2,7 @@
 extends BossState
 
 @export var attack_cooldown: float = 1.2
-@export var damage: int = 2
+@export var damage: int = 20
 
 ## Frame index within "attack_p1" where the hit lands.
 @export var hit_frame: int = 5

@@ -7,10 +7,11 @@
 [ext_resource type="Script" uid="uid://ba8p4w38l5j83" path="res://scripts/managers/test_slope.gd" id="6_6xh4u"]
 [ext_resource type="Script" uid="uid://c28sj31wgv3w8" path="res://scripts/objects/checkpoint.gd" id="8_7x1jh"]
 [ext_resource type="Script" uid="uid://b4787who0v5db" path="res://scenes/levels/test_death.gd" id="9_hfwtw"]
-[ext_resource type="PackedScene" uid="uid://baiiqrs5m3q8r" path="res://scenes/enemies/example_enemy.tscn" id="10_2mu0v"]
+[ext_resource type="PackedScene" uid="uid://dxyvjf46yg2hw" path="res://scenes/enemies/example_enemy.tscn" id="10_2mu0v"]
 [ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="10_room"]
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="11_tiles"]
 [ext_resource type="PackedScene" uid="uid://ddyxy7y3x8yq1" path="res://scenes/objects/interactive_door.tscn" id="12_door"]
+[ext_resource type="PackedScene" uid="uid://ob42r6vtkns3" path="res://scenes/objects/checkpoint.tscn" id="12_eaa0b"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_fr1um"]
 
@@ -40,15 +41,15 @@ size = Vector2(180, 14)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_di6hr"]
 size = Vector2(150, 14)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_c0m0a"]
-size = Vector2(79, 71)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nb7sj"]
 size = Vector2(65, 71)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c0m0a"]
+size = Vector2(79, 71)
+
 [node name="TestLevel" type="Node2D" unique_id=1287401612]
 
-[node name="CombatLevelDoor" parent="." instance=ExtResource("12_door")]
+[node name="CombatLevelDoor" parent="." unique_id=1998026216 instance=ExtResource("12_door")]
 position = Vector2(-60, 430)
 target_scene = "res://scenes/levels/combat_level/combat_level.tscn"
 target_spawn_name = "PlayerSpawn"
@@ -149,23 +150,6 @@ collision_enabled = false
 
 [node name="RoomInstance" parent="." unique_id=124679751 instance=ExtResource("10_room")]
 
-[node name="TestCheckpoint" type="Area2D" parent="." unique_id=1686615500]
-position = Vector2(-189, 410)
-collision_layer = 3
-script = ExtResource("8_7x1jh")
-checkpoint_id = "test_checkpoint_01"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestCheckpoint" unique_id=305320053]
-shape = SubResource("RectangleShape2D_c0m0a")
-
-[node name="Label" type="Label" parent="TestCheckpoint" unique_id=1192156899]
-offset_left = -44.0
-offset_top = -31.0
-offset_right = 44.0
-offset_bottom = -8.0
-text = "Checkpoint"
-metadata/_edit_use_anchors_ = true
-
 [node name="TestDeath" type="Area2D" parent="." unique_id=582002832]
 position = Vector2(-417, 400)
 script = ExtResource("9_hfwtw")
@@ -195,3 +179,27 @@ position = Vector2(216, 19)
 
 [node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1210987215]
 position = Vector2(491, 18)
+
+[node name="TestCheckpoint" type="Area2D" parent="." unique_id=1204858898]
+position = Vector2(150, 411)
+collision_layer = 3
+script = ExtResource("8_7x1jh")
+checkpoint_id = "test_checkpoint_01"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TestCheckpoint" unique_id=843292286]
+shape = SubResource("RectangleShape2D_c0m0a")
+
+[node name="Label" type="Label" parent="TestCheckpoint" unique_id=1914029939]
+offset_left = -44.0
+offset_top = -31.0
+offset_right = 44.0
+offset_bottom = -8.0
+text = "Checkpoint"
+metadata/_edit_use_anchors_ = true
+
+[node name="Checkpoints" type="Node2D" parent="." unique_id=3454942]
+position = Vector2(631, 632)
+
+[node name="Checkpoint" parent="." unique_id=1939128494 instance=ExtResource("12_eaa0b")]
+position = Vector2(-203, 412)
+checkpoint_id = "asdas"
