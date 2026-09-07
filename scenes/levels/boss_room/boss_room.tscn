@@ -87,3 +87,8 @@ visible = false
 position = Vector2(959.5, 492.5)
 shape = SubResource("RectangleShape2D_u82t8")
 disabled = true
+[node name="PlayerSpawnContainer" type="Node2D" parent="."]
+
+[node name="PlayerSpawn" type="Marker2D" parent="PlayerSpawnContainer"]
+position = Vector2(-600, 309)
+

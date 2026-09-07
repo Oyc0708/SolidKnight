@@ -30,6 +30,11 @@ func _physics_process(delta: float) -> void:
 	_attack_timer = max(0.0, _attack_timer - delta)
 	_update_state()
 	super._physics_process(delta)
+	
+	# Apply gravity so the ground enemy doesn't float
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+		
 	move_and_slide()
 
 
@@ -99,3 +104,48 @@ func _on_return(_delta: float) -> void:
 
 	if global_position.distance_to(_origin_position) < 8.0:
 		state = State.PATROL
+
+
+# ─── Animation Logic ──────────────────────────────────────────────────────────
+
+func _process(_delta: float) -> void:
+	# Try to find the AnimatedSprite2D under Visuals
+	var anim_sprite = get_node_or_null("Visuals/AnimatedSprite2D")
+	
+	if state == State.DEAD or anim_sprite == null:
+		return
+		
+	# 1. Flip the sprite left/right based on movement direction
+	if velocity.x > 0.1:
+		anim_sprite.flip_h = false # Facing Right (adjust if your sprite is drawn facing left)
+	elif velocity.x < -0.1:
+		anim_sprite.flip_h = true  # Facing Left
+		
+	# 2. Play the correct animation based on state
+	if state == State.ATTACK:
+		anim_sprite.play("attack")
+	elif abs(velocity.x) > 5.0:
+		anim_sprite.play("run")
+	else:
+		anim_sprite.play("idle")
+
+func _die() -> void:
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	
+	var anim_sprite = get_node_or_null("Visuals/AnimatedSprite2D")
+	if anim_sprite and anim_sprite.sprite_frames and anim_sprite.sprite_frames.has_animation("dead"):
+		# Force the animation not to loop, otherwise animation_finished never fires!
+		anim_sprite.sprite_frames.set_animation_loop("dead", false)
+		anim_sprite.play("dead")
+		
+		if has_node("CollisionShape2D"):
+			$CollisionShape2D.set_deferred("disabled", true)
+		if has_node("Hurtbox"):
+			$Hurtbox.set_deferred("monitoring", false)
+			$Hurtbox.set_deferred("monitorable", false)
+			
+		await anim_sprite.animation_finished
+		
+	super._die()
