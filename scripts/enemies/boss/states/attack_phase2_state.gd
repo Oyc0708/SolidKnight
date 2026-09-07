@@ -1,7 +1,7 @@
 # attack_phase2_state.gd
 extends BossState
 
-@export var attack_cooldown: float = 0.6
+@export var attack_cooldown: float = 0.4
 @export var damage: int = 40
 
 ## Frame index within "attack_p2" where the hit lands.

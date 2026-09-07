@@ -17,3 +17,4 @@ func physics_update(delta: float) -> void:
 	_timer -= delta
 	if _timer <= 0.0:
 		boss.state_machine.transition_to(^"TrackState")
+ 

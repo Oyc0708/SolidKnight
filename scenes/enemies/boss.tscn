@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://c0pmll4ucp71c" path="res://scripts/enemies/boss/states/attack_phase2_state.gd" id="6_attack2"]
 [ext_resource type="Script" uid="uid://w3f46n58l4nb" path="res://scripts/enemies/boss/states/phase_transition_state.gd" id="7_phasetrans"]
 [ext_resource type="Script" uid="uid://buh7duc7tjgkc" path="res://scripts/enemies/boss/states/death_state.gd" id="8_death"]
+[ext_resource type="Script" uid="uid://ykoigrd8731y" path="res://hurtbox.gd" id="9_hurtbox"]
 [ext_resource type="Texture2D" uid="uid://bvll8d0eghv24" path="res://assets/sprites/boss_enemy/Bringer-of-Death-SpritSheet.png" id="33_yj1sh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w576v"]
@@ -142,18 +143,6 @@ region = Rect2(700, 372, 140, 93)
 atlas = ExtResource("33_yj1sh")
 region = Rect2(840, 372, 140, 93)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ac4lo"]
-atlas = ExtResource("33_yj1sh")
-region = Rect2(280, 279, 140, 93)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_r65h2"]
-atlas = ExtResource("33_yj1sh")
-region = Rect2(420, 279, 140, 93)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_63knr"]
-atlas = ExtResource("33_yj1sh")
-region = Rect2(560, 279, 140, 93)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_86s4d"]
 atlas = ExtResource("33_yj1sh")
 region = Rect2(0, 0, 140, 93)
@@ -185,6 +174,18 @@ region = Rect2(840, 0, 140, 93)
 [sub_resource type="AtlasTexture" id="AtlasTexture_cm6am"]
 atlas = ExtResource("33_yj1sh")
 region = Rect2(980, 0, 140, 93)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ac4lo"]
+atlas = ExtResource("33_yj1sh")
+region = Rect2(280, 279, 140, 93)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r65h2"]
+atlas = ExtResource("33_yj1sh")
+region = Rect2(420, 279, 140, 93)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_63knr"]
+atlas = ExtResource("33_yj1sh")
+region = Rect2(560, 279, 140, 93)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pno13"]
 atlas = ExtResource("33_yj1sh")
@@ -333,20 +334,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ac4lo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r65h2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_63knr")
-}],
-"loop": 0,
-"name": &"hurt",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_86s4d")
 }, {
 "duration": 1.0,
@@ -373,6 +360,35 @@ animations = [{
 "loop": 1,
 "name": &"idle",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac4lo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r65h2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_63knr")
+}],
+"loop": 0,
+"name": &"phase_transition",
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -417,15 +433,22 @@ script = ExtResource("1_boss")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=665220512]
 shape = SubResource("RectangleShape2D_w576v")
 
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1730895470 node_paths=PackedStringArray("owner_node")]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("9_hurtbox")
+owner_node = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=287043618]
+shape = SubResource("RectangleShape2D_w576v")
+
 [node name="Visuals" type="Node2D" parent="." unique_id=1950950906]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visuals" unique_id=79556980]
 position = Vector2(-152, -94.00001)
 scale = Vector2(4.358, 5)
 sprite_frames = SubResource("SpriteFrames_mtwg1")
-animation = &"hurt"
-frame = 2
-frame_progress = 1.0
+animation = &"phase_transition"
 
 [node name="AttackRangeArea" type="Area2D" parent="Visuals" unique_id=1327519297]
 collision_layer = 0

@@ -36,12 +36,14 @@ func _ready() -> void:
 		var spawn_marker := map.find_child("PlayerSpawn", true, false) as Marker2D
 		if spawn_marker:
 			player.global_position = spawn_marker.global_position
+	_refresh_camera_for_room()
 	
 	#Debug Test
 	print("[Game] Loaded room: ", starting_room)
 	print("[Game] Current room instance: ", MetSys.get_current_room_instance())
 	
 func _on_room_loaded() -> void:
+	_refresh_camera_for_room()
 	EventBus.room_transition_finished.emit()
 
 # Fix for Bug #14: Update the HUD when health changes
@@ -70,4 +72,18 @@ func transition_to_room(room_path: String, spawn_marker_name: String = "") -> vo
 		else:
 			push_warning("[Game] Spawn marker not found: " + spawn_marker_name)
 
+	_refresh_camera_for_room()
 	GameManager.set_state(GameManager.State.PLAYING)
+
+## Reassert the player camera after a scene change, then apply the loaded
+## room's bounds after the player has reached its spawn point.
+func _refresh_camera_for_room() -> void:
+	var camera := get_node_or_null("Player/Camera2D") as Camera2D
+	if camera:
+		camera.enabled = true
+		camera.make_current()
+		camera.reset_smoothing()
+
+	var camera_zone := map.get_node_or_null("CameraZone") if map else null
+	if camera_zone and camera_zone.has_method("_check_player_inside"):
+		camera_zone.call_deferred("_check_player_inside")

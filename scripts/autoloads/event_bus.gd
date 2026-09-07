@@ -45,6 +45,7 @@ signal hit_landed(target: Node, damage: int, hit_position: Vector2)
 signal enemy_damaged(enemy: Node, amount: int)
 signal enemy_died(enemy: Node, position: Vector2)
 signal enemy_attacked(enemy: Node2D)
+signal boss_phase_changed(new_phase: int)
 
 # ─── GEO (CURRENCY) ──────────────────────────────────────────────────────────
 # Geo is the in-game currency (equivalent to Hollow Knight's geo)

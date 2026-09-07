@@ -23,6 +23,18 @@ var _origin_position: Vector2
 func _ready() -> void:
 	super._ready()
 	_origin_position = global_position
+
+	# Auto-assign patrol points based on enemy name if not already set
+	if patrol_point_a == null:
+		var candidate = _find_patrol_point(name + "_PatrolA")
+		if candidate:
+			patrol_point_a = candidate
+
+	if patrol_point_b == null:
+		var candidate = _find_patrol_point(name + "_PatrolB")
+		if candidate:
+			patrol_point_b = candidate
+
 	_patrol_target = patrol_point_b
 
 
@@ -65,7 +77,19 @@ func _find_player_in_range() -> Node2D:
 		return p
 	return null
 
+func _find_patrol_point(point_name: String) -> Marker2D:
+	# Search in the whole scene (including all descendants)
+	var all_nodes = get_tree().get_nodes_in_group("patrol_points")
+	for node in all_nodes:
+		if node.name == point_name:
+			return node as Marker2D
 
+	# Fallback: search by name directly
+	var candidate = get_tree().root.find_child(point_name, true, false)
+	if candidate is Marker2D:
+		return candidate
+
+	return null
 # ─── State overrides ──────────────────────────────────────────────────────────
 
 func _on_patrol(_delta: float) -> void:
