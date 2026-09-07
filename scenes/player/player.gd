@@ -614,9 +614,12 @@ func _handle_attack_input() -> void:
 
 	# ── Determine attack direction ────────────────────────────────────────────
 	# Checked at the moment of button press — cannot be changed mid-attack.
-	if Input.is_action_pressed("move_up"):
+	var is_up = (InputMap.has_action("move_up") and Input.is_action_pressed("move_up")) or Input.is_action_pressed("ui_up")
+	var is_down = (InputMap.has_action("move_down") and Input.is_action_pressed("move_down")) or Input.is_action_pressed("ui_down")
+	
+	if is_up:
 		_attack_direction = "up"
-	elif Input.is_action_pressed("move_down") and not is_on_floor():
+	elif is_down and not is_on_floor():
 		# Down-slash only in the air — on the ground, down+jump = drop-through
 		_attack_direction = "down"
 	else:

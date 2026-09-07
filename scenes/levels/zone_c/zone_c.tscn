@@ -63,3 +63,8 @@ script = ExtResource("3_kjb7e")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone" unique_id=257158751]
 position = Vector2(959, 496.5)
 shape = SubResource("RectangleShape2D_ow4gm")
+[node name="PlayerSpawnContainer" type="Node2D" parent="."]
+
+[node name="PlayerSpawn" type="Marker2D" parent="PlayerSpawnContainer"]
+position = Vector2(0, 0)
+

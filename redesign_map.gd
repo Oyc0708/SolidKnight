@@ -3,7 +3,7 @@ extends EditorScript
 
 func _run():
 	print("Starting combat level redesign (Error-Free Version)...")
-	var scene_path = "res://scenes/levels/combat_level/combat_level.tscn"
+	var scene_path = "res://scenes/levels/zone_a/zone_a.tscn"
 	var packed_scene = load(scene_path)
 	if not packed_scene:
 		print("Failed to load scene")
@@ -195,7 +195,7 @@ func _run():
 	var cp_script = load("res://scripts/objects/auto_checkpoint.gd")
 	if cp_script:
 		checkpoint.set_script(cp_script)
-		checkpoint.set("checkpoint_id", "combat_level_start")
+		checkpoint.set("checkpoint_id", "zone_a_start")
 	var cp_shape = CollisionShape2D.new()
 	var cp_rect = RectangleShape2D.new()
 	cp_rect.size = Vector2(64, 64)
