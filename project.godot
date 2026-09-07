@@ -12,8 +12,8 @@ config_version=5
 
 config/name="Solid Knight"
 config/version="0.1.0"
-run/main_scene="uid://c2bbxjni56f0e"
-config/features=PackedStringArray("4.7", "Forward Plus")
+run/main_scene="res://scenes/menus/main_menu.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
 
 [audio]
 
@@ -28,6 +28,7 @@ AudioManager="*uid://bs5lb1a2svh1a"
 SceneManager="*uid://cli1ue3ii4afg"
 MetSys="*uid://c01ibpvrp2wsd"
 LevelManager="*uid://bdbmoufqhvos0"
+DialogueManager="*uid://ck8prv01pjgnv"
 
 [display]
 
