@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://bcvcw6tgrbkr2"]
+[gd_scene format=4 uid="uid://dm3hpcw22gigr"]
 
 [ext_resource type="Script" uid="uid://dks3vj2ocyya5" path="res://scripts/managers/test_ground.gd" id="1_jbqir"]
 [ext_resource type="Script" uid="uid://wg2ylam521ca" path="res://scripts/managers/test_platform.gd" id="2_yautc"]
@@ -51,7 +51,7 @@ size = Vector2(79, 71)
 
 [node name="CombatLevelDoor" parent="." unique_id=1998026216 instance=ExtResource("12_door")]
 position = Vector2(-60, 430)
-target_scene = "res://scenes/levels/combat_level/combat_level.tscn"
+target_scene = "res://scenes/levels/zone_a/zone_a.tscn"
 target_spawn_name = "PlayerSpawn"
 
 [node name="Ground" type="StaticBody2D" parent="." unique_id=593486914]

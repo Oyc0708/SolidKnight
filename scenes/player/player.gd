@@ -345,6 +345,9 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 		_is_attacking     = false
 		_attack_direction = "neutral"
 		_debug_hitbox_active = false
+		var hitbox = get_node_or_null("Hitbox")
+		if hitbox:
+			hitbox.set_deferred("monitoring", false)
 		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:
 			ap.stop()
@@ -566,6 +569,9 @@ func _start_dash() -> void:
 		_is_attacking        = false
 		_attack_direction    = "neutral"
 		_debug_hitbox_active = false
+		var hitbox = get_node_or_null("Hitbox")
+		if hitbox:
+			hitbox.set_deferred("monitoring", false)
 		var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:
 			ap.stop()
@@ -608,9 +614,12 @@ func _handle_attack_input() -> void:
 
 	# ── Determine attack direction ────────────────────────────────────────────
 	# Checked at the moment of button press — cannot be changed mid-attack.
-	if Input.is_action_pressed("move_up"):
+	var is_up = (InputMap.has_action("move_up") and Input.is_action_pressed("move_up")) or Input.is_action_pressed("ui_up")
+	var is_down = (InputMap.has_action("move_down") and Input.is_action_pressed("move_down")) or Input.is_action_pressed("ui_down")
+	
+	if is_up:
 		_attack_direction = "up"
-	elif Input.is_action_pressed("move_down") and not is_on_floor():
+	elif is_down and not is_on_floor():
 		# Down-slash only in the air — on the ground, down+jump = drop-through
 		_attack_direction = "down"
 	else:
@@ -622,11 +631,24 @@ func _handle_attack_input() -> void:
 	
 	# Trigger the corresponding AnimationPlayer timing track.
 	var ap := get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if ap:
+	if ap and ap.has_animation("attack_01"):
 		match _attack_direction:
 			"up":   ap.play("attack_up")
 			"down": ap.play("attack_down")
 			_:      ap.play("attack_01")
+	else:
+		# Fallback: AnimationPlayer is missing method tracks, so simulate them via timers
+		_on_attack_started()
+		# t=0.15: Activate hitbox
+		get_tree().create_timer(0.15, false).timeout.connect(func():
+			if _is_attacking:
+				_on_attack_hitbox_active(true)
+		)
+		# t=0.25: Deactivate hitbox
+		get_tree().create_timer(0.25, false).timeout.connect(func():
+			if _is_attacking:
+				_on_attack_hitbox_active(false)
+		)
 
 
 # ─── RANGED ATTACK ───────────────────────────────────────────────────────────

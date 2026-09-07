@@ -59,3 +59,8 @@ script = ExtResource("3_ypk3b")
 
 position = Vector2(961.5, 666.75)
 shape = SubResource("RectangleShape2D_beqvt")
+[node name="PlayerSpawnContainer" type="Node2D" parent="."]
+
+[node name="PlayerSpawn" type="Marker2D" parent="PlayerSpawnContainer"]
+position = Vector2(0, 0)
+

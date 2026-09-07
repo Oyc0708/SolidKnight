@@ -69,6 +69,26 @@ func _update_flying_state() -> void:
 	elif dist <= detection_range:
 		state = State.CHASE
 
+# ─── ANIMATION LOGIC ──────────────────────────────────────────────────────────
+
+func _process(_delta: float) -> void:
+	var anim_sprite = get_node_or_null("Visuals/AnimatedSprite2D")
+	
+	if state == State.DEAD or anim_sprite == null:
+		return
+		
+	# 1. Flip sprite based on movement direction
+	if velocity.x > 0.1:
+		anim_sprite.flip_h = false
+	elif velocity.x < -0.1:
+		anim_sprite.flip_h = true
+		
+	# 2. Play the correct animation
+	if state == State.ATTACK:
+		anim_sprite.play("attack")
+	else:
+		anim_sprite.play("idle")
+
 
 func _find_player_in_range() -> Node2D:
 	var players: Array = get_tree().get_nodes_in_group(&"player")
@@ -109,3 +129,26 @@ func _on_attack(_delta: float) -> void:
 ## Flying enemies don't patrol or return — just hover
 func _on_return(_delta: float) -> void:
 	_on_patrol(_delta)
+
+func _die() -> void:
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	
+	var anim_sprite = get_node_or_null("Visuals/AnimatedSprite2D")
+	if anim_sprite and anim_sprite.sprite_frames and anim_sprite.sprite_frames.has_animation("dead"):
+		# Force the animation not to loop, otherwise animation_finished never fires!
+		anim_sprite.sprite_frames.set_animation_loop("dead", false)
+		anim_sprite.play("dead")
+		
+		# Turn off collisions so it stops hitting the player
+		if has_node("CollisionShape2D"):
+			$CollisionShape2D.set_deferred("disabled", true)
+		if has_node("Hurtbox"):
+			$Hurtbox.set_deferred("monitoring", false)
+			$Hurtbox.set_deferred("monitorable", false)
+			
+		# Wait for the animation to finish
+		await anim_sprite.animation_finished
+		
+	super._die()
