@@ -1,11 +1,11 @@
 # attack_phase2_state.gd
 extends BossState
 
-@export var attack_cooldown: float = 0.7
-@export var damage: int = 3
+@export var attack_cooldown: float = 0.6
+@export var damage: int = 40
 
 ## Frame index within "attack_p2" where the hit lands.
-@export var hit_frame: int = 2
+@export var hit_frame: int = 5
 
 var _hit_landed_this_swing: bool = false
 var _waiting_for_cooldown: bool = false
@@ -29,11 +29,11 @@ func exit() -> void:
 
 
 func physics_update(delta: float) -> void:
+	# Attacks play until finish
+	# Hit vs. miss is decided at the hit frame instead (see _on_frame_changed).
 	if boss.player_ref == null:
 		boss.state_machine.transition_to(^"IdleState")
 		return
-
-	boss.face_toward(boss.player_ref.global_position.x)
 
 	if _waiting_for_cooldown:
 		_cooldown_timer = max(0.0, _cooldown_timer - delta)
@@ -54,11 +54,8 @@ func _on_frame_changed() -> void:
 	if boss.animated_sprite.frame != hit_frame:
 		return
 
-	var facing_right := boss.visuals.scale.x > 0
-	var player_is_right := boss.player_ref != null and boss.player_ref.global_position.x > boss.global_position.x
-	var facing_correct := boss.player_ref == null or facing_right == player_is_right
-
-	if boss.player_in_attack_range and facing_correct and boss.player_ref and boss.player_ref.has_method("take_damage"):
+	# Only deal damage if the player is in range right now 
+	if boss.player_in_attack_range and boss.player_ref and boss.player_ref.has_method("take_damage"):
 		boss.player_ref.take_damage(damage)
 		EventBus.enemy_attacked.emit(boss)
 

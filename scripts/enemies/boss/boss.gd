@@ -15,9 +15,11 @@ class_name Boss
 @onready var state_machine: BossStateMachine = $StateMachine
 @onready var detection_area: Area2D = $DetectionArea
 @onready var attack_range_area: Area2D = $Visuals/AttackRangeArea
+@onready var attack_range_collision: CollisionShape2D = $Visuals/AttackRangeArea/CollisionShape2D
+
 
 var current_health: int
-var phase: int = 1
+var phase: int = 2
 var player_ref: Node2D = null
 var player_in_attack_range: bool = false
 
@@ -28,12 +30,6 @@ func _ready() -> void:
 	detection_area.body_exited.connect(_on_detection_exited)
 	attack_range_area.body_entered.connect(_on_attack_range_entered)
 	attack_range_area.body_exited.connect(_on_attack_range_exited)
-
-
-	#var shape_node: CollisionShape2D = attack_range_area.get_node("CollisionShape2D")
-	#if shape_node.shape is RectangleShape2D:
-		#(shape_node.shape as RectangleShape2D).size = Vector2(attack_range, attack_range)
-		#shape_node.position = Vector2(attack_range / 2.0, 0)
 
 
 func _on_detection_entered(body: Node2D) -> void:
@@ -71,3 +67,27 @@ func take_damage(amount: int) -> void:
 	if phase == 1 and float(current_health) / max_health <= phase_2_threshold:
 		phase = 2
 		state_machine.transition_to(^"PhaseTransitionState")
+		
+		
+func _set_attack_range_for_phase(new_phase: int) -> void:
+	# 1. Change the size using the CollisionShape2D
+	if attack_range_collision.shape is RectangleShape2D:
+		var rect := attack_range_collision.shape as RectangleShape2D
+		match new_phase:
+			1:
+				rect.size = Vector2(332.0, 133)
+			2:
+				rect.size = Vector2(434.0, 266.0)
+	elif attack_range_collision.shape is CircleShape2D:
+		var circle := attack_range_collision.shape as CircleShape2D
+		match new_phase:
+			1:
+				circle.radius = 50.0
+			2:
+				circle.radius = 80.0
+
+	# 2. After resizing, use the Area2D to re-check overlap
+	if player_ref and attack_range_area.overlaps_body(player_ref):
+		player_in_attack_range = true
+	else:
+		player_in_attack_range = false

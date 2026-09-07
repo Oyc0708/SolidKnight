@@ -1,14 +1,10 @@
 [gd_scene format=4 uid="uid://cbewfh1wihxk0"]
 
 [ext_resource type="PackedScene" uid="uid://bsg0351mx3b4u" path="res://addons/MetroidvaniaSystem/Nodes/RoomInstance.tscn" id="1_dxuby"]
-[ext_resource type="PackedScene" uid="uid://dxyvjf46yg2hw" path="res://scenes/enemies/example_enemy.tscn" id="2_i2g2l"]
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="3_ahe6h"]
+[ext_resource type="PackedScene" uid="uid://ob42r6vtkns3" path="res://scenes/objects/checkpoint.tscn" id="3_aqrwt"]
 [ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_i2g2l"]
 [ext_resource type="PackedScene" uid="uid://b4kg5hyvdfovb" path="res://scenes/enemies/boss.tscn" id="3_u82t8"]
-[ext_resource type="Script" uid="uid://c28sj31wgv3w8" path="res://scripts/objects/checkpoint.gd" id="4_aqrwt"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bbkfk"]
-size = Vector2(79, 71)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u82t8"]
 size = Vector2(1923, 991)
@@ -24,39 +20,14 @@ position = Vector2(720.09485, 495.3853)
 [node name="Enemies" type="Node2D" parent="." unique_id=1847326698]
 position = Vector2(1104, 474)
 
-[node name="ExampleEnemy" parent="Enemies" unique_id=1484103932 node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("2_i2g2l")]
-position = Vector2(576, 272)
-patrol_point_a = NodePath("../PatrolA")
-patrol_point_b = NodePath("../PatrolB")
-
-[node name="PatrolA" type="Marker2D" parent="Enemies" unique_id=1639746131]
-position = Vector2(289, 415)
-
-[node name="PatrolB" type="Marker2D" parent="Enemies" unique_id=1111150664]
-position = Vector2(713, 417)
-
 [node name="Boss" parent="Enemies" unique_id=695709896 instance=ExtResource("3_u82t8")]
-position = Vector2(-214, 309)
+position = Vector2(-144, 352)
 
 [node name="Checkpoints" type="Node2D" parent="." unique_id=509300861]
 position = Vector2(631, 632)
 
-[node name="TestCheckpoint" type="Area2D" parent="Checkpoints" unique_id=86915937]
-position = Vector2(-74.277954, 264.90564)
-collision_layer = 3
-script = ExtResource("4_aqrwt")
-checkpoint_id = "test_checkpoint_01"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoints/TestCheckpoint" unique_id=2031503752]
-shape = SubResource("RectangleShape2D_bbkfk")
-
-[node name="Label" type="Label" parent="Checkpoints/TestCheckpoint" unique_id=870680225]
-offset_left = -44.0
-offset_top = -31.0
-offset_right = 44.0
-offset_bottom = -8.0
-text = "Checkpoint"
-metadata/_edit_use_anchors_ = true
+[node name="Checkpoint" parent="Checkpoints" unique_id=610369029 instance=ExtResource("3_aqrwt")]
+position = Vector2(868, 288.99997)
 
 [node name="SpawnPoints" type="Node2D" parent="." unique_id=1533892377]
 position = Vector2(947, 613)
@@ -69,6 +40,7 @@ tile_map_data = PackedByteArray("AAD8/zwAAAAMAAQAAAD9/zwAAAANAAQAAAD+/zwAAAAOAAQ
 tile_set = ExtResource("3_ahe6h")
 
 [node name="BackGround" type="TileMapLayer" parent="TileMap" unique_id=1820533781]
+visible = false
 modulate = Color(0.7373294, 0.7373294, 0.7977378, 1)
 z_index = -1
 z_as_relative = false
@@ -87,8 +59,6 @@ visible = false
 position = Vector2(959.5, 492.5)
 shape = SubResource("RectangleShape2D_u82t8")
 disabled = true
-[node name="PlayerSpawnContainer" type="Node2D" parent="."]
 
-[node name="PlayerSpawn" type="Marker2D" parent="PlayerSpawnContainer"]
-position = Vector2(-600, 309)
-
+[node name="Checkpoint" parent="." unique_id=1791559513 instance=ExtResource("3_aqrwt")]
+position = Vector2(144.72205, 924.90564)
