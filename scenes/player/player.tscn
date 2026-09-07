@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dxgtr3egk55au"]
+
+[ext_resource type="Script" uid="uid://blfafydbim2g4" path="res://scenes/player/player.gd" id="1_8afob"]
+[ext_resource type="SpriteFrames" uid="uid://dnxmwddbhlc2m" path="res://assets/sprites/player/player_frames.tres" id="2_dovo2"]
+[ext_resource type="PackedScene" uid="uid://csjjnc5kjmeum" path="res://scenes/combat/hurtbox.tscn" id="2_lvxji"]
+[ext_resource type="Script" uid="uid://ckoukomd2vaby" path="res://scripts/player/player_animation.gd" id="3_gmlin"]
+[ext_resource type="PackedScene" uid="uid://c41nv4l8mw52s" path="res://scenes/combat/hitbox.tscn" id="4_hitbox"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2qiir"]
+size = Vector2(42, 41.5)
+
+[sub_resource type="Gradient" id="Gradient_gmlin"]
+offsets = PackedFloat32Array(0.10817308, 0.48317307, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.16870415, 0.16870415, 0.16870415, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_c0m0a"]
+gradient = SubResource("Gradient_gmlin")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="Player" type="CharacterBody2D" unique_id=422246210]
+collision_layer = 2
+collision_mask = 4097
+script = ExtResource("1_8afob")
+
+[node name="Hurtbox" parent="." unique_id=2002891219 instance=ExtResource("2_lvxji")]
+
+[node name="Hitbox" parent="." unique_id=674390234 instance=ExtResource("4_hitbox")]
+collision_layer = 0
+collision_mask = 16
+monitoring = false
+damage = 25
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082857435]
+position = Vector2(0, -8.75)
+shape = SubResource("RectangleShape2D_2qiir")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=958145430]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=560794161]
+position = Vector2(0, -24)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("2_dovo2")
+animation = &"attack_01"
+script = ExtResource("3_gmlin")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=197582199]
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=178278157]
+texture = SubResource("GradientTexture2D_c0m0a")

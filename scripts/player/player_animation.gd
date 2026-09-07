@@ -1,0 +1,238 @@
+# player_animation.gd
+# ─────────────────────────────────────────────────────────────────────────────
+# MILESTONE M2.5 — Ranged Attack Integration
+#
+# Changes:
+#   + Added ANIM_SHOOT constant
+#   + Added shooting priority to _update_animation() cascade
+#   + Ignored speed scaling while shooting
+# ─────────────────────────────────────────────────────────────────────────────
+class_name PlayerAnimationController
+extends AnimatedSprite2D
+
+
+# ─── ANIMATION NAME CONSTANTS ─────────────────────────────────────────────────
+
+const ANIM_IDLE: String        = "idle"
+const ANIM_WALK: String        = "walk"
+const ANIM_RUN: String         = "run"
+const ANIM_JUMP_RISE: String   = "jump_rise"
+const ANIM_JUMP_FALL: String   = "jump_fall"
+const ANIM_JUMP_LAND: String   = "jump_land"
+const ANIM_WALL_SLIDE: String  = "wall_slide"
+const ANIM_DOUBLE_JUMP: String = "double_jump"
+const ANIM_DASH: String        = "dash"
+const ANIM_HURT: String        = "hurt"
+const ANIM_DEATH: String       = "dead" 
+const ANIM_ATTACK_01: String   = "attack_01"
+const ANIM_ATTACK_UP: String   = "attack_up"
+const ANIM_ATTACK_DOWN: String = "attack_down"
+const ANIM_SHOOT: String       = "shoot" # ← NEW M2.5
+
+
+# ─── TUNING CONSTANTS ─────────────────────────────────────────────────────────
+
+## Horizontal speed above which "run" plays instead of "walk"
+const RUN_THRESHOLD: float = 0.8
+
+## Horizontal speed below which "idle" plays instead of "walk"
+const IDLE_THRESHOLD: float = 10.0
+
+## Maximum slope angle (radians) before sprite tilt is clamped (~30°)
+const MAX_TILT_ANGLE: float = 0.52
+
+## velocity.y magnitude below which the player is considered "at the apex".
+const APEX_THRESHOLD: float = 60.0
+
+## Minimum animation playback multiplier — used when barely moving.
+const MIN_ANIM_SPEED: float = 0.6
+
+## Maximum animation playback multiplier — used at full sprint.
+const MAX_ANIM_SPEED: float = 1.4
+
+
+# ─── PLAYER REFERENCE ─────────────────────────────────────────────────────────
+
+var _player: PlayerController
+
+
+# ─── ONE-SHOT ANIMATION LOCK ──────────────────────────────────────────────────
+
+var _locked_anim: String = ""
+
+
+# ─── TRANSITION DETECTION ─────────────────────────────────────────────────────
+
+var _was_airborne: bool = false
+var _prev_dj_timer: float = 0.0
+
+
+# ─── BUILT-IN FUNCTIONS ──────────────────────────────────────────────────────
+
+func _ready() -> void:
+	_player = get_parent() as PlayerController
+
+	if _player == null:
+		push_error("[PlayerAnimation] Parent is not a PlayerController.")
+		return
+
+	animation_finished.connect(_on_animation_finished)
+
+	play(ANIM_IDLE)
+	print("[PlayerAnimation] Ready")
+
+
+func _process(_delta: float) -> void:
+	if _player == null:
+		return
+
+	# ── Per-frame transition detection ────────────────────────────────────────
+	var on_floor: bool       = _player.is_on_floor()
+	var just_landed: bool    = on_floor and _was_airborne
+
+	var dj_timer: float          = _player.get_double_jump_flash_timer()
+	var just_double_jumped: bool = dj_timer > 0.0 and _prev_dj_timer == 0.0
+
+	_was_airborne  = not on_floor
+	_prev_dj_timer = dj_timer
+
+	# ── Update visual properties ──────────────────────────────────────────────
+	_update_flip()
+	_update_tilt()
+	_update_animation_speed()
+
+	# ── Drive the animation cascade ───────────────────────────────────────────
+	_update_animation(just_landed, just_double_jumped)
+
+
+# ─── VISUAL PROPERTY UPDATES ──────────────────────────────────────────────────
+
+func _update_flip() -> void:
+	flip_h = _player.facing_direction < 0.0
+
+
+func _update_tilt() -> void:
+	if _player.is_on_floor():
+		rotation = clamp(_player.get_floor_angle(), -MAX_TILT_ANGLE, MAX_TILT_ANGLE)
+	else:
+		rotation = 0.0
+
+
+func _update_animation_speed() -> void:
+	var on_floor: bool        = _player.is_on_floor()
+	var is_attacking: bool    = _player.is_attacking()
+	var is_shooting: bool     = _player.is_shooting()
+	var is_dashing: bool      = _player.is_dashing()
+	var is_wall_sliding: bool = _player.is_wall_sliding()
+
+	# Non-movement states: return to default speed
+	if not on_floor or is_attacking or is_shooting or is_dashing or is_wall_sliding:
+		speed_scale = 1.0
+		return
+
+	var h_speed: float        = abs(_player.velocity.x)
+	var speed_fraction: float = clamp(h_speed / _player.move_speed, 0.0, 1.0)
+
+	speed_scale = lerp(MIN_ANIM_SPEED, MAX_ANIM_SPEED, speed_fraction)
+
+
+# ─── ANIMATION PRIORITY CASCADE ───────────────────────────────────────────────
+
+func _update_animation(just_landed: bool, just_double_jumped: bool) -> void:
+
+	# ── GUARD: One-shot animation is locked ───────────────────────────────────
+	if _locked_anim != "":
+		if _player.get_knockback_timer() > 0.0:
+			if _locked_anim != ANIM_HURT and _locked_anim != ANIM_DEATH:
+				_play_locked(ANIM_HURT)
+		return
+
+	# ── PRIORITY 1: HURT ─────────────────────────────────────────────────────
+	if _player.get_knockback_timer() > 0.0:
+		_play_locked(ANIM_HURT)
+		return
+
+	# ── PRIORITY 2: ATTACK ───────────────────────────────────────────────────
+	if _player.is_attacking():
+		match _player.get_attack_direction():
+			"up":   _play(ANIM_ATTACK_UP)
+			"down": _play(ANIM_ATTACK_DOWN)
+			_:      _play(ANIM_ATTACK_01)
+		return
+
+	# ── PRIORITY 3: SHOOT ────────────────────────────────────────────────────
+	if _player.is_shooting():
+		_play(ANIM_SHOOT)
+		return
+
+	# ── PRIORITY 4: DASH ─────────────────────────────────────────────────────
+	if _player.is_dashing():
+		_play(ANIM_DASH)
+		return
+
+	# ── PRIORITY 5: WALL SLIDE ───────────────────────────────────────────────
+	if _player.is_wall_sliding():
+		_play(ANIM_WALL_SLIDE)
+		return
+
+	# ── PRIORITY 6: LANDING ──────────────────────────────────────────────────
+	if just_landed:
+		_play_locked(ANIM_JUMP_LAND)
+
+		var ap := get_parent().get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if ap:
+			ap.play("player_land")
+		return
+
+	# ── PRIORITY 7: AIRBORNE ─────────────────────────────────────────────────
+	if not _player.is_on_floor():
+		if just_double_jumped:
+			_play_locked(ANIM_DOUBLE_JUMP)
+			return
+
+		var vy: float = _player.velocity.y
+		if vy < -APEX_THRESHOLD:
+			_play(ANIM_JUMP_RISE)
+		else:
+			_play(ANIM_JUMP_FALL)
+		return
+
+	# ── PRIORITY 8: GROUNDED MOVEMENT ────────────────────────────────────────
+	var h_speed: float = abs(_player.velocity.x)
+
+	if h_speed > IDLE_THRESHOLD:
+		if h_speed >= _player.move_speed * RUN_THRESHOLD:
+			_play(ANIM_RUN)
+		else:
+			_play(ANIM_WALK)
+		return
+
+	# ── PRIORITY 9: IDLE ─────────────────────────────────────────────────────
+	_play(ANIM_IDLE)
+
+
+# ─── ANIMATION PLAYBACK HELPERS ───────────────────────────────────────────────
+
+func _play(anim_name: String) -> void:
+	if animation == anim_name and is_playing():
+		return
+	play(anim_name)
+
+
+func _play_locked(anim_name: String) -> void:
+	if _locked_anim == anim_name:
+		return   
+	if not sprite_frames.has_animation(anim_name):   
+		push_warning("[PlayerAnimation] Missing animation: " + anim_name)   
+		return   
+	_locked_anim = anim_name
+	play(anim_name)
+
+
+# ─── SIGNAL HANDLERS ─────────────────────────────────────────────────────────
+
+func _on_animation_finished() -> void:
+	var finished: String = _locked_anim
+	if finished == ANIM_DEATH:
+		return
+	_locked_anim = ""

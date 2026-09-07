@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c2bbxjni56f0e"]
+
+[ext_resource type="PackedScene" uid="uid://dxgtr3egk55au" path="res://scenes/player/player.tscn" id="1_e64el"]
+[ext_resource type="Script" uid="uid://bp6djbhebgui7" path="res://scenes/main/game.gd" id="1_ma5rq"]
+[ext_resource type="PackedScene" uid="uid://sqe7a4i06hp1" path="res://scenes/menus/pause_menu.tscn" id="4_gf1f2"]
+[ext_resource type="PackedScene" uid="uid://7xubr0dxu3ku" path="res://scenes/hud/player_hud.tscn" id="4_gsayk"]
+
+[node name="Game" type="Node2D" unique_id=1132983403]
+script = ExtResource("1_ma5rq")
+starting_room = "uid://bcvcw6tgrbkr2"
+
+[node name="Player" parent="." unique_id=422246210 instance=ExtResource("1_e64el")]
+
+[node name="PauseMenu" parent="." unique_id=917024324 instance=ExtResource("4_gf1f2")]
+
+[node name="PlayerHud" parent="." unique_id=1738001189 instance=ExtResource("4_gsayk")]
