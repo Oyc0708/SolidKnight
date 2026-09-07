@@ -20,4 +20,10 @@ func load_zone_b() -> void:
 
 
 func load_zone_c() -> void:
-	SceneManager.go_to_scene(ZONE_C)
+	# Keep the existing player, heart HUD, camera and pause/settings menu.
+	# The PlayerSpawn marker inside Zone C is also used as its death checkpoint.
+	var game := get_tree().get_first_node_in_group(&"game")
+	if game != null and game.has_method("transition_to_room"):
+		await game.transition_to_room(ZONE_C, "PlayerSpawn")
+	else:
+		SceneManager.go_to_scene(ZONE_C)

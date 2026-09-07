@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_traps/zone_c_attack_bridge.gd" id="1_bridge"]
+[ext_resource type="Script" path="res://hitbox.gd" id="2_hitbox"]
+
+[sub_resource type="RectangleShape2D" id="AttackShape"]
+size = Vector2(40, 50)
+
+[sub_resource type="Animation" id="AttackWindow"]
+resource_name = "attack_window"
+length = 0.55
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.15, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{"method": &"_set_hitbox_active", "args": [true]}, {"method": &"_set_hitbox_active", "args": [false]}]
+}
+
+[sub_resource type="Animation" id="PlayerAttackTiming"]
+resource_name = "player_attack_timing"
+length = 0.55
+
+[sub_resource type="Animation" id="PlayerLand"]
+resource_name = "player_land"
+length = 0.1
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{"method": &"_on_land_impact", "args": []}]
+}
+
+[sub_resource type="AnimationLibrary" id="AttackLibrary"]
+_data = {
+&"attack_01": SubResource("PlayerAttackTiming"),
+&"attack_down": SubResource("PlayerAttackTiming"),
+&"attack_up": SubResource("PlayerAttackTiming"),
+&"attack_window": SubResource("AttackWindow"),
+&"player_land": SubResource("PlayerLand")
+}
+
+[node name="ZoneCAttackBridge" type="Node2D"]
+script = ExtResource("1_bridge")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("2_hitbox")
+damage = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("AttackShape")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {&"": SubResource("AttackLibrary")}
+
+[connection signal="area_entered" from="Hitbox" to="Hitbox" method="_on_area_entered"]

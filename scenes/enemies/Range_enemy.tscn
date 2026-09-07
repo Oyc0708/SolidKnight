@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://b6lok50fimg34"]
+[ext_resource type="Script" path="res://scripts/enemy_traps/ranged_enemy.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/range_enemy/idle.png" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_traps/arrow.tscn" id="3"]
+[ext_resource type="Script" path="res://hurtbox.gd" id="4"]
+[sub_resource type="AtlasTexture" id="frame0"]
+atlas = ExtResource("2")
+region = Rect2(82, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame1"]
+atlas = ExtResource("2")
+region = Rect2(382, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame2"]
+atlas = ExtResource("2")
+region = Rect2(682, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame3"]
+atlas = ExtResource("2")
+region = Rect2(982, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame4"]
+atlas = ExtResource("2")
+region = Rect2(1282, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame5"]
+atlas = ExtResource("2")
+region = Rect2(1582, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame6"]
+atlas = ExtResource("2")
+region = Rect2(1882, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame7"]
+atlas = ExtResource("2")
+region = Rect2(2182, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame8"]
+atlas = ExtResource("2")
+region = Rect2(2482, 102, 150, 193)
+[sub_resource type="AtlasTexture" id="frame9"]
+atlas = ExtResource("2")
+region = Rect2(2782, 102, 150, 193)
+[sub_resource type="SpriteFrames" id="frames"]
+animations = [{"frames": [{"duration":1.0,"texture":SubResource("frame0")},{"duration":1.0,"texture":SubResource("frame1")},{"duration":1.0,"texture":SubResource("frame2")},{"duration":1.0,"texture":SubResource("frame3")},{"duration":1.0,"texture":SubResource("frame4")},{"duration":1.0,"texture":SubResource("frame5")},{"duration":1.0,"texture":SubResource("frame6")},{"duration":1.0,"texture":SubResource("frame7")},{"duration":1.0,"texture":SubResource("frame8")},{"duration":1.0,"texture":SubResource("frame9")}],"loop":true,"name":&"idle","speed":8.0}]
+[sub_resource type="RectangleShape2D" id="body"]
+size = Vector2(34, 64)
+[node name="Range_enemy" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1")
+projectile_scene = ExtResource("3")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0,-32)
+shape = SubResource("body")
+[node name="Visuals" type="Node2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visuals"]
+position = Vector2(0,-38.6)
+scale = Vector2(0.4,0.4)
+sprite_frames = SubResource("frames")
+autoplay = "idle"
+[node name="Muzzle" type="Marker2D" parent="Visuals"]
+position = Vector2(33,-34)
+[node name="AimWarning" type="Label" parent="Visuals"]
+offset_left = -8.0
+offset_top = -118.0
+theme_override_colors/font_color = Color(1,0.62,0.25,1)
+theme_override_font_sizes/font_size = 30
+text = "!"
+[node name="Status" type="Label" parent="."]
+visible = false
+offset_left = -170.0
+offset_right = 170.0
+offset_top = -147.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+[node name="LineOfSight" type="RayCast2D" parent="."]
+position = Vector2(0,-34)
+target_position = Vector2(600,0)
+collision_mask = 3
+[node name="FloorAhead" type="RayCast2D" parent="."]
+position = Vector2(32,-10)
+target_position = Vector2(0,50)
+collision_mask = 1
+[node name="ShotCooldown" type="Timer" parent="."]
+wait_time = 1.4
+one_shot = true
+[node name="AimTimer" type="Timer" parent="."]
+wait_time = 0.55
+one_shot = true
+[node name="Hurtbox" type="Area2D" parent="." node_paths=PackedStringArray("owner_node")]
+position = Vector2(0,-32)
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4")
+owner_node = NodePath("..")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("body")

@@ -18,7 +18,7 @@ func _process(delta: float) -> void:
 ## Handles the "Start" button press.
 func _on_start_pressed() -> void:
 	EventBus.play_sfx_requested.emit("button_click")
-	get_tree().change_scene_to_file("res://scenes/main/game.tscn")
+	get_tree().change_scene_to_file("res://scenes/tutorial/test_scene.tscn")
 
 ## Handles the "Settings" button press.
 func _on_settings_pressed() -> void:
