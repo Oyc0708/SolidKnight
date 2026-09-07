@@ -28,6 +28,7 @@ AudioManager="*uid://bs5lb1a2svh1a"
 SceneManager="*uid://cli1ue3ii4afg"
 MetSys="*uid://c01ibpvrp2wsd"
 LevelManager="*uid://bdbmoufqhvos0"
+DialogueManager="*uid://ck8prv01pjgnv"
 
 [display]
 
