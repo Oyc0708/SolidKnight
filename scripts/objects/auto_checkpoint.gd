@@ -17,6 +17,7 @@ func _ready() -> void:
 
 	# Auto-activate on level load
 	GameManager.set_checkpoint(checkpoint_id, global_position, _get_owning_room_path())
+	_restore_player_health(get_tree().get_first_node_in_group(&"player"))
 	EventBus.checkpoint_activated.emit(checkpoint_id)
 
 
@@ -24,6 +25,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group(&"player"):
 		return
 	GameManager.set_checkpoint(checkpoint_id, global_position, _get_owning_room_path())
+	_restore_player_health(body)
 
 
 func _get_owning_room_path() -> String:
@@ -33,3 +35,7 @@ func _get_owning_room_path() -> String:
 			return node.scene_file_path
 		node = node.get_parent()
 	return ""
+
+func _restore_player_health(body: Node) -> void:
+	if body is PlayerController:
+		body.heal(body.max_health)

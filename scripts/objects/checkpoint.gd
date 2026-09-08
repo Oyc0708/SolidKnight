@@ -25,6 +25,7 @@ func _on_body_entered(body: Node2D) -> void:
 
 	# Always set the checkpoint when the player touches it, allowing reuse
 	GameManager.set_checkpoint(checkpoint_id, global_position, _get_owning_room_path())
+	_restore_player_health(body)
 
 	# Only fire the visual/audio feedback event once
 	if not _activated:
@@ -54,3 +55,7 @@ func _get_owning_room_path() -> String:
 			return node.scene_file_path
 		node = node.get_parent()
 	return ""
+
+func _restore_player_health(body: Node2D) -> void:
+	if body is PlayerController:
+		body.heal(body.max_health)
