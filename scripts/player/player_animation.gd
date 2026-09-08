@@ -9,8 +9,9 @@
 # ─────────────────────────────────────────────────────────────────────────────
 class_name PlayerAnimationController
 extends AnimatedSprite2D
-
-
+@onready var _slash: AnimatedSprite2D = $"../Slash"
+var _slash_playing: bool = false
+var _was_attacking: bool = false
 # ─── ANIMATION NAME CONSTANTS ─────────────────────────────────────────────────
 
 const ANIM_IDLE: String        = "idle"
@@ -77,9 +78,14 @@ func _ready() -> void:
 		return
 
 	animation_finished.connect(_on_animation_finished)
-
+	
+	_slash.animation_finished.connect(_on_slash_finished)
+	_slash.visible = false
+	
 	play(ANIM_IDLE)
 	print("[PlayerAnimation] Ready")
+	
+	
 
 
 func _process(_delta: float) -> void:
@@ -158,7 +164,14 @@ func _update_animation(just_landed: bool, just_double_jumped: bool) -> void:
 			"up":   _play(ANIM_ATTACK_UP)
 			"down": _play(ANIM_ATTACK_DOWN)
 			_:      _play(ANIM_ATTACK_01)
+			
+		if not _was_attacking:
+			_play_slash()
+
+		_was_attacking = true
 		return
+
+	_was_attacking = false
 
 	# ── PRIORITY 3: SHOOT ────────────────────────────────────────────────────
 	if _player.is_shooting():
@@ -236,3 +249,27 @@ func _on_animation_finished() -> void:
 	if finished == ANIM_DEATH:
 		return
 	_locked_anim = ""
+	
+	
+func _play_slash() -> void:
+	if _slash == null:
+		return
+
+	_slash_playing = true
+	_slash.visible = true
+
+	# Put slash in front of player
+	if _player.facing_direction >= 0.0:
+		_slash.position = Vector2(35, -20)
+		_slash.flip_h = false
+	else:
+		_slash.position = Vector2(-35, -20)
+		_slash.flip_h = true
+
+	_slash.stop()
+	_slash.frame = 0
+	_slash.play("slash")
+	
+func _on_slash_finished() -> void:
+	_slash.visible = false
+	_slash_playing = false

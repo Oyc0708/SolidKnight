@@ -8,6 +8,11 @@
 class_name PlayerController
 extends CharacterBody2D
 
+@onready var sprite: AnimatedSprite2D = $Sprite
+@onready var hitbox: Area2D = $Hitbox
+var attacking: bool = false
+
+
 # ─── HEALTH STATE ─────────────────────────────────────────────────────────────
 
 ## Emitted whenever health changes so the HUD can update automatically
@@ -244,7 +249,8 @@ func _ready() -> void:
 	collision_mask  = 0
 	set_collision_mask_value(1,  true)    # Layer 1: World (solid geometry)
 	set_collision_mask_value(13, true)    # Layer 13: OneWayPlatform
-
+	hitbox.monitoring = false
+	sprite.animation_finished.connect(_on_animation_finished)
 	# ── Floor snap ───────────────────────────────────────────────────────────
 	# Keeps the player grounded when cresting hills or slope peaks.
 	# Godot disables this automatically when velocity.y < 0 (jumping upward).
@@ -906,3 +912,24 @@ func _handle_continuous_sfx(delta: float) -> void:
 			EventBus.play_sfx_requested.emit("wall_slide")
 	else:
 		_wall_slide_sfx_timer = 0.0
+
+
+
+func attack() -> void:
+	if attacking:
+		return
+
+	attacking = true
+
+	# Play attack animation
+	sprite.play("attack_01")
+
+	# Enable hitbox
+	hitbox.monitoring = true
+
+
+func _on_animation_finished() -> void:
+	if sprite.animation == "attack_01":
+		# Attack is finished
+		hitbox.monitoring = false
+		attacking = false

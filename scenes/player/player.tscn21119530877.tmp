@@ -128,7 +128,7 @@ texture = SubResource("GradientTexture2D_c0m0a")
 [node name="Node2D" type="Node2D" parent="." unique_id=1514905050]
 
 [node name="Slash" type="AnimatedSprite2D" parent="." unique_id=1705414310]
-visible = false
+position = Vector2(66, -13)
 sprite_frames = SubResource("SpriteFrames_p47bc")
 animation = &"slash"
 script = ExtResource("7_0owmy")
