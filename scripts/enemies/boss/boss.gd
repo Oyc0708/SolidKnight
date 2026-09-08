@@ -5,6 +5,9 @@
 extends CharacterBody2D
 class_name Boss
 
+signal health_changed(current_health: int, max_health: int)
+signal died()
+
 @export var max_health: int = 500
 @export var move_speed: float = 80.0
 #@export var attack_range: float = 60.0
@@ -27,11 +30,15 @@ var player_in_attack_range: bool = false
 
 
 func _ready() -> void:
+	add_to_group("boss")
+	print("BOSS READY: ", self)
+	print("BOSS GROUPS: ", get_groups())
 	current_health = max_health
 	detection_area.body_entered.connect(_on_detection_entered)
 	detection_area.body_exited.connect(_on_detection_exited)
 	attack_range_area.body_entered.connect(_on_attack_range_entered)
 	attack_range_area.body_exited.connect(_on_attack_range_exited)
+	
 
 
 func _on_detection_entered(body: Node2D) -> void:
@@ -60,10 +67,11 @@ func take_damage(amount: int) -> void:
 	if state_machine.current_state and state_machine.current_state.name == "DeathState":
 		return
 
-	current_health -= amount
+	current_health = max(current_health - amount, 0)
+	health_changed.emit(current_health, max_health)
 
 	if current_health <= 0:
-		current_health = 0
+		died.emit()
 		state_machine.transition_to(^"DeathState")
 		return
 

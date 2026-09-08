@@ -1,15 +1,17 @@
 extends CanvasLayer
 
+@onready var boss_health_bar = $BossHealthBar
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	boss_health_bar.hide_bar()
 
+func _process(_delta: float) -> void:
+	if not boss_health_bar.visible:
+		var bosses = get_tree().get_nodes_in_group("boss")
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
+		if bosses.size() > 0:
+			print("Boss found by HUD!")
+			boss_health_bar.setup_boss(bosses[0])
 
 func _on_pause_button_pressed() -> void:
 	GameManager.toggle_pause()

@@ -426,7 +426,7 @@ size = Vector2(332, 133)
 [sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
 radius = 649.0123
 
-[node name="Boss" type="CharacterBody2D" unique_id=1453964398]
+[node name="Boss" type="CharacterBody2D" unique_id=1453964398 groups=["boss"]]
 collision_layer = 4
 script = ExtResource("1_boss")
 

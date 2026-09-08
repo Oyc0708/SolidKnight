@@ -111,7 +111,6 @@ motion_scale = Vector2(0.3, 0.3)
 motion_mirroring = Vector2(2048, 2048)
 
 [node name="BackgroundTexture" type="TextureRect" parent="ParallaxBackground/ParallaxLayer" unique_id=959670054]
-visible = false
 modulate = Color(0.2, 0.2, 0.3, 1)
 offset_left = -1024.0
 offset_top = -1024.0
@@ -141,7 +140,6 @@ collision_mask = 2
 script = ExtResource("7_mkx13")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraZone" unique_id=723040975]
-visible = false
 position = Vector2(1266.5, 372.75)
 shape = SubResource("RectangleShape2D_gxmoy")
 

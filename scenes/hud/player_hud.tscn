@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bh5rulu46q1fx" path="res://assets/ui/32x32-Tilesheet.png" id="3_3dwfp"]
 [ext_resource type="Script" uid="uid://bmj2nvt0oralh" path="res://scenes/hud/pause_button.gd" id="4_3dwfp"]
 [ext_resource type="Texture2D" uid="uid://6ab5uplderc" path="res://assets/ui/icon_normal.png" id="5_1g7pp"]
+[ext_resource type="Script" uid="uid://bpju5feualiqs" path="res://scenes/hud/boss_health_bar.gd" id="7_1g7pp"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_byfoi"]
 atlas = ExtResource("3_3dwfp")
@@ -84,5 +85,35 @@ offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("5_1g7pp")
+
+[node name="BossHealthBar" type="Control" parent="." unique_id=250652331]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("7_1g7pp")
+
+[node name="Panel" type="Panel" parent="BossHealthBar" unique_id=1684277098]
+layout_mode = 0
+offset_left = 295.0
+offset_top = 124.0
+offset_right = 963.0
+offset_bottom = 193.0
+
+[node name="BossName" type="Label" parent="BossHealthBar/Panel" unique_id=655280961]
+layout_mode = 0
+offset_left = 251.0
+offset_top = 9.0
+offset_right = 402.0
+offset_bottom = 32.0
+text = "BRINGER OF DEATH"
+horizontal_alignment = 1
+
+[node name="HealthBar" type="ProgressBar" parent="BossHealthBar/Panel" unique_id=2626588]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 32.0
+offset_right = 657.0
+offset_bottom = 59.0
 
 [connection signal="pressed" from="heart/PauseButton" to="." method="_on_pause_button_pressed"]

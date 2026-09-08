@@ -41,6 +41,10 @@ window/stretch/aspect="expand"
 
 enabled=PackedStringArray("res://addons/MetroidvaniaSystem/EditorExtension/plugin.cfg", "res://addons/MetroidvaniaSystem/plugin.cfg")
 
+[global_group]
+
+boss=""
+
 [input]
 
 move_left={
