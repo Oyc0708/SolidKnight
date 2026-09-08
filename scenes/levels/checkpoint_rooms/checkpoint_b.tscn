@@ -20,7 +20,6 @@ tile_map_data = PackedByteArray("AAD///v/AAACAAEAAAD///z/AAACAAEAAAD///3/AAACAAE
 tile_set = ExtResource("2_006n0")
 
 [node name="BackGround" type="TileMapLayer" parent="TileMap" unique_id=443189583]
-visible = false
 modulate = Color(0.7373294, 0.7373294, 0.7977378, 1)
 z_index = -1
 use_parent_material = true
