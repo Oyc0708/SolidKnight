@@ -1,7 +1,6 @@
 extends Node2D
-## Zone C attack support without editing the shared Player scene.
-## The actual hit area, collision shape and timing animation are saved nodes in
-## zone_c_attack_bridge.tscn. This script connects them to the existing player.
+
+## zone_c_attack_bridge.tscn. This script just test in my own , not use after combine.
 
 var player: PlayerController
 var was_attacking := false
@@ -43,9 +42,6 @@ func _find_player() -> void:
 
 
 func _install_missing_player_animations() -> void:
-	# The original Player has an AnimationPlayer node and calls these names, but
-	# its scene contains no animation library. Copy the small saved support
-	# animations from this Zone C scene at runtime. Nothing is saved to Player.
 	var player_animation := player.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	var support_library := timing.get_animation_library(&"")
 	if player_animation == null or support_library == null:

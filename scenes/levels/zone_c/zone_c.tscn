@@ -4,8 +4,6 @@
 [ext_resource type="TileSet" uid="uid://bpx1it0sc53fr" path="res://assets/tiles/world_tileset.tres" id="2_vtywv"]
 [ext_resource type="Script" uid="uid://3utkj0kljycy" path="res://scenes/levels/boss_room/camera_zone.gd" id="3_kjb7e"]
 [ext_resource type="PackedScene" uid="uid://b6lok50fimg34" path="res://scenes/enemies/Range_enemy.tscn" id="zone_archer"]
-[ext_resource type="PackedScene" path="res://scenes/enemy_traps/zone_c_attack_bridge.tscn" id="zone_attack_bridge"]
-[ext_resource type="Script" uid="uid://d32rxeu5bi1f6" path="res://scripts/enemy_traps/zone_c_controller.gd" id="zone_controller"]
 [ext_resource type="PackedScene" path="res://scenes/enemy_traps/crusher_trap.tscn" id="zone_crusher"]
 [ext_resource type="PackedScene" path="res://scenes/enemy_traps/crystal_trap.tscn" id="zone_crystal"]
 [ext_resource type="PackedScene" path="res://scenes/enemy_traps/rotating_trap.tscn" id="zone_rotating"]
@@ -15,7 +13,6 @@
 size = Vector2(1460, 991)
 
 [node name="ZoneC" type="Node2D" unique_id=1788066769]
-script = ExtResource("zone_controller")
 
 [node name="RoomInstance" parent="." unique_id=1695379856 instance=ExtResource("1_yu2hq")]
 
@@ -44,6 +41,7 @@ position = Vector2(948, 752)
 start_offset = 1.0
 
 [node name="Enemies" type="Node2D" parent="." unique_id=1907915174]
+visible = true
 
 [node name="ArcherLeft" parent="Enemies" unique_id=1076692671 instance=ExtResource("zone_archer")]
 position = Vector2(480, 752)
@@ -72,8 +70,6 @@ move_speed = 55.0
 
 [node name="PlayerSpawn" type="Marker2D" parent="SpawnPoints" unique_id=1040149913]
 position = Vector2(96, 936)
-
-[node name="PlayerAttackBridge" parent="." unique_id=585878144 instance=ExtResource("zone_attack_bridge")]
 
 [node name="TileMap" type="Node2D" parent="." unique_id=203455904]
 
