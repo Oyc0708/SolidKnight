@@ -392,6 +392,7 @@ func take_damage(amount: int, source_position: Vector2 = Vector2.ZERO) -> void:
 	# ── Notify EventBus ───────────────────────────────────────────────────────
 	# Phase 5 health system, Phase 11 audio, and Phase 12 VFX all listen here
 	EventBus.player_damaged.emit(amount, source_position)
+	EventBus.play_sfx_requested.emit("player_hurt")
 
 	# ── Trigger Death ─────────────────────────────────────────────────────────
 	if current_health <= 0:
@@ -836,6 +837,7 @@ func get_attack_direction() -> String:
 
 ## Called at t=0.00 of every attack animation — fires the swing sound request
 func _on_attack_started() -> void:
+	EventBus.play_sfx_requested.emit("player_attack_swing")
 	print("[Player] Attack started — direction: ", _attack_direction)
 
 

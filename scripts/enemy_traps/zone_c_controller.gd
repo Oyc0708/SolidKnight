@@ -6,9 +6,6 @@ extends Node2D
 
 
 func _ready() -> void:
-	# The shared player checks this action for an upward attack, but the original
-	# project does not define it. Register it for this game session without
-	# changing project.godot or the teammate's player files.
 	if not InputMap.has_action(&"move_up"):
 		InputMap.add_action(&"move_up")
 		var up_key := InputEventKey.new()

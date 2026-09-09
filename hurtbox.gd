@@ -2,8 +2,8 @@
 class_name Hurtbox
 extends Area2D
 
-# We export the node that actually has the health/take_damage function.
-# Usually, this is the CharacterBody2D root node (like your Player).
+#  export the node that actually has the health/take_damage function.
+# Usually, this is the CharacterBody2D root node 
 @export var owner_node: Node2D
 @export var iframe_duration: float = 0.5
 

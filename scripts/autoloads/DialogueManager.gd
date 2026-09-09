@@ -4,7 +4,7 @@ signal dialogue_started
 signal dialogue_ended
 signal dialogue_advanced(step_index: int)
 
-# Your tutorial dialogue lines
+# tutorial dialogue lines
 var tutorial_steps: Array[String] = [
 	"Before you enter the ruins, practise moving and jumping in this hall.",
 	"1 / 4 • Walk to the arrow",

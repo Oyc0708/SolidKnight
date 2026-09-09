@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Inspector values let you balance this enemy without changing the script.
+
 @export var max_health: int = 30
 @export var detection_distance: float = 620.0
 @export var retreat_distance: float = 160.0
