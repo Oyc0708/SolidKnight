@@ -6,7 +6,7 @@ extends EnemyBase
 # ============================================================
 @export var patrol_speed: float = 55.0
 @export var patrol_distance: float = 110.0
-@export var hover_pause: float = 0.7
+@export var hover_pause: float = 2.0
 
 @export var hover_amplitude: float = 5.0
 @export var hover_frequency: float = 2.0
@@ -23,7 +23,7 @@ extends EnemyBase
 @export var dive_windup: float = 0.35
 @export var dive_speed: float = 230.0
 @export var dive_duration: float = 0.9
-@export var dive_damage: int = 15
+@export var dive_damage: int = 20
 @export var attack_cooldown: float = 1.8
 
 # ============================================================
@@ -330,21 +330,16 @@ func _set_flyer_state(new_state: int, duration: float = 0.0) -> void:
 # ============================================================
 # SPRITE CONTROL
 # ============================================================
-func _set_sprite(animation_name: StringName, frame_number: int) -> void:
+func _set_sprite(animation_name: StringName, _frame_number: int = 0) -> void:
 	if sprite.sprite_frames == null:
 		return
 
 	if not sprite.sprite_frames.has_animation(animation_name):
 		return
 
-	sprite.animation = animation_name
-	sprite.pause()
+	if sprite.animation != animation_name or not sprite.is_playing():
+		sprite.play(animation_name)
 
-	var frame_count: int = sprite.sprite_frames.get_frame_count(animation_name)
-	if frame_count <= 0:
-		return
-
-	sprite.frame = clampi(frame_number, 0, frame_count - 1)
 	_update_facing()
 
 # ============================================================
@@ -360,3 +355,24 @@ func _update_facing() -> void:
 		sprite.flip_h = horizontal_direction > 0.0
 	else:
 		sprite.flip_h = horizontal_direction < 0.0
+		
+# ============================================================
+# DEATH
+# ============================================================
+func _die() -> void:
+	if state == State.DEAD:
+		return
+
+	state = State.DEAD
+	velocity = Vector2.ZERO
+
+	# Stop collisions while the death animation is playing.
+	$CollisionShape2D.set_deferred("disabled", true)
+	$Hurtbox.set_deferred("monitoring", false)
+	$Hurtbox.set_deferred("monitorable", false)
+
+	if sprite.sprite_frames.has_animation(&"death"):
+		sprite.play(&"death")
+		await sprite.animation_finished
+
+	super._die()
